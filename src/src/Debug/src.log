@@ -1,7 +1,1 @@
-﻿  filesystem.cpp
-c:\users\albin\documents\bth\dv1492 realtid- och operativsystem\realos_filesystem\src\filesystem.cpp(39): warning C4018: '<': signed/unsigned mismatch
-c:\users\albin\documents\bth\dv1492 realtid- och operativsystem\realos_filesystem\src\filesystem.cpp(49): warning C4018: '<': signed/unsigned mismatch
-c:\users\albin\documents\bth\dv1492 realtid- och operativsystem\realos_filesystem\src\filesystem.cpp(63): warning C4018: '<': signed/unsigned mismatch
-c:\users\albin\documents\bth\dv1492 realtid- och operativsystem\realos_filesystem\src\filesystem.cpp(139): warning C4018: '<': signed/unsigned mismatch
-c:\users\albin\documents\bth\dv1492 realtid- och operativsystem\realos_filesystem\src\filesystem.cpp(143): warning C4018: '<': signed/unsigned mismatch
-  src.vcxproj -> C:\Users\Albin\Documents\BTH\DV1492 Realtid- och operativsystem\realOS_filesystem\src\Debug\src.exe
+﻿  src.vcxproj -> C:\Users\Albin\Documents\BTH\DV1492 Realtid- och operativsystem\realOS_filesystem\src\Debug\src.exe

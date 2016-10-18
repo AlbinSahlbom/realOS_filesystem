@@ -56,7 +56,6 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 {
 	int result = -5;
-	
 
 	if (dirPath == "")
 	{
@@ -69,14 +68,23 @@ int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 	else
 	{
 		std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
+
 		if (dirPath[0] == '/')
 		{
 			//Absolut path
 			result = CheckKidsListDir(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
 		}
+		else if (dirs[0] == "")
+		{
+			for (int i = 0; i < root.nbrOfKids; i++)
+			{
+				std::cout << root.kids[i]->directoryName << std::endl;
+				result = 0;
+			}
+		}
 		else
 		{
-			result = CheckKidsListDir(&this->currentDirectory, dirs, 0);
+			result = CheckKidsListDir(&currentDirectory, dirs, 0);
 		}
 	}
 	return result;
@@ -159,6 +167,7 @@ std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
 {
 	std::vector<std::string> dirs;
 	std::string temp = "";
+	int asd = dirPath.length();
 	for (unsigned int i = 0; i <= dirPath.length(); i++)
 	{
 
