@@ -1,0 +1,9 @@
+﻿  shell.cpp
+  memblockdevice.cpp
+  filesystem.cpp
+c:\users\albin\documents\bth\dv1492 realtid- och operativsystem\realos_filesystem\src\filesystem.cpp(33): warning C4018: '<': signed/unsigned mismatch
+c:\users\albin\documents\bth\dv1492 realtid- och operativsystem\realos_filesystem\src\filesystem.cpp(43): warning C4018: '<': signed/unsigned mismatch
+  blockdevice.cpp
+  block.cpp
+  Generating Code...
+  src.vcxproj -> C:\Users\Albin\Documents\BTH\DV1492 Realtid- och operativsystem\realOS_filesystem\src\Debug\src.exe
