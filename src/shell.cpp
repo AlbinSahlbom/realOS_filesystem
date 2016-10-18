@@ -17,7 +17,7 @@ int findCommand(std::string &command);
 std::string help();
 
 int main(void) {
-    FileSystem* fileSystem = new FileSystem();
+    FileSystem* fileSystem = new FileSystem();		//Delete this when program quits
 
 	std::string userCommand, commandArr[MAXCOMMANDS];
 	std::string user = "user@DV1492";    // Change this if you want another user to be displayed
@@ -45,7 +45,10 @@ int main(void) {
                 break;
             case 2: // ls
                 std::cout << "Listing directory" << std::endl;
-                // Call filesystem.ls()
+				if (fileSystem->ListDir(commandArr[1], currentDir) == -5)
+				{
+					std::cout << "ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
+				}
                 break;
             case 3: // create
                 break;
@@ -63,11 +66,11 @@ int main(void) {
                 break;
             case 10: // mv
                 break;
-            case 11: // mkdir
+            case 11: // mkdir	//Klar
                 std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
                 if(fileSystem->MakeDirectory(commandArr[1], currentDir) == -5)
                 {
-                    std::cout << "mkdir: cannot create directory " <<commandArr[1] << ": No such file or directory\n" << std::endl;
+                    std::cout << "mkdir: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
                 }
 
                 break;

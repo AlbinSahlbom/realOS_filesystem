@@ -47,7 +47,22 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 }
 
 
-int FileSystem::CheckKids(node *currentNode, std::vector<std::string> dirs, unsigned int index)
+int FileSystem::ListDir(std::string dirPath, std::string currentDir)
+{
+	std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
+
+	for (int i = 0; i < dirPath.length(); i++)
+	{
+		if (dirPath[0] == '/')
+		{
+			//Absolut path
+
+		}
+	}
+	return 0;
+}
+
+int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index)
 {
 	int result = -5;
 
@@ -71,7 +86,7 @@ int FileSystem::CheckKids(node *currentNode, std::vector<std::string> dirs, unsi
 				{
 					index = index +1;
 					std::cout << "Dirs size index: " << dirs.size() << " Index: " << index << std::endl;
-					result = CheckKids(currentNode->kids[k], dirs, index);
+					result = CheckKidsMakeDir(currentNode->kids[k], dirs, index);
 					k = currentNode->nbrOfKids;//exit loop
 					madeDir = true;
 				}
@@ -97,22 +112,42 @@ int FileSystem::CheckKids(node *currentNode, std::vector<std::string> dirs, unsi
 	return result;
 }
 
-int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
+int FileSystem::CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index)
+{
+	int result = -5;
+
+	for (int  i = 0; i < currentNode->nbrOfKids; i++)
+	{
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
+		{
+			for (int k = 0; i < currentNode->kids[i]->nbrOfKids; i++)
+			{
+				std::cout << currentNode->kids[i]->kids[k]->directoryName << std::endl;
+			}
+			i = currentNode->nbrOfKids;
+			result = 0;
+		}
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
+		{
+			result = CheckKidsListDir(currentNode->kids[i], dirs, index++);
+		}
+	}
+	return result;
+}
+
+std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
 {
 	std::vector<std::string> dirs;
 	std::string temp = "";
-	std::cout << "Dir path lenght: " << dirPath.length() << std::endl;
-	int result = -5;
-
 	for (unsigned int i = 0; i <= dirPath.length(); i++)
 	{
 
-		if(dirPath[i] == '/')
+		if (dirPath[i] == '/')
 		{
 			dirs.push_back(temp);
 			temp = "";
 		}
-		else if(i == dirPath.length() && dirPath[i] != '/')
+		else if (i == dirPath.length() && dirPath[i] != '/')
 		{
 			dirs.push_back(temp);
 			temp = "";
@@ -122,17 +157,52 @@ int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
 			temp += dirPath[i];
 		}
 	}
+	return std::vector<std::string>();
+}
+
+int FileSystem::CreateFile(std::string filePath, std::string currentDir)
+{
+	int result = -5;
+	return result;
+}
+
+int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
+{
+	std::vector<std::string> dirs;
+	//std::string temp = "";
+	std::cout << "Dir path lenght: " << dirPath.length() << std::endl;
+	int result = -5;
+
+	dirs = ConvertDirPathToVector(dirPath);
+	//for (unsigned int i = 0; i <= dirPath.length(); i++)
+	//{
+	//	if(dirPath[i] == '/')
+	//	{
+	//		dirs.push_back(temp);
+	//		temp = "";
+	//	}
+	//	else if(i == dirPath.length() && dirPath[i] != '/')
+	//	{
+	//		dirs.push_back(temp);
+	//		temp = "";
+	//	}
+	//	else
+	//	{
+	//		temp += dirPath[i];
+	//	}
+	//}
 	if(dirPath[0]=='/')
 	{
 		//Absolut path
-		result = CheckKids(&root, dirs, 1);
+		result = CheckKidsMakeDir(&root, dirs, 1);
 		std::cout << "Check kids result: " << result << std::endl;
 	}
 	else
 	{
-		result = CheckKids(&this->currentDirectory, dirs, 0);
+		result = CheckKidsMakeDir(&this->currentDirectory, dirs, 0);
 		std::cout << "Check kids result: " <<  result << std::endl;
 	}
 	return result;
 }
+
 

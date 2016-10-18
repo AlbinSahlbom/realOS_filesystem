@@ -49,12 +49,14 @@ public:
     // goToFolder(...);
 
     /* This function will get all the files and folders in the specified folder */
-    // listDir(...);
+    int ListDir(std::string dirPath, std::string currentDir);
 
 
 
     /* Add your own member-functions if needed */
-    int CheckKids(node *currentNode, std::vector<std::string> dirs, unsigned int index);
+    int CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
+	int CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
+	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);
 };
 
 #endif // FILESYSTEM_H
