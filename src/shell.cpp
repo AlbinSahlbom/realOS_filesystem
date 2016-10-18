@@ -12,8 +12,9 @@ std::string availableCommands[NUMAVAILABLECOMMANDS] = {
 };
 
 /* Takes usercommand from input and returns number of commands, commands are stored in strArr[] */
-int parseCommandString(const std::string &userCommand, std::string strArr[]);
-int findCommand(std::string &command);
+int ParseCommandString(const std::string &userCommand, std::string strArr[]);
+int FindCommand(std::string &command);
+void ClearCommandArr(std::string *commandArr);
 std::string help();
 
 int main(void) {
@@ -30,10 +31,10 @@ int main(void) {
         
         getline(std::cin, userCommand);
 
-        int nrOfCommands = parseCommandString(userCommand, commandArr);
+        int nrOfCommands = ParseCommandString(userCommand, commandArr);
         if (nrOfCommands > 0) {
 
-            int cIndex = findCommand(commandArr[0]);
+            int cIndex = FindCommand(commandArr[0]);
             switch(cIndex) {
 
             case 0: // quit
@@ -49,6 +50,7 @@ int main(void) {
 				{
 					std::cout << "ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
 				}
+				ClearCommandArr(commandArr);
                 break;
             case 3: // create
                 break;
@@ -72,7 +74,7 @@ int main(void) {
                 {
                     std::cout << "mkdir: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
                 }
-
+				ClearCommandArr(commandArr);
                 break;
             case 12: // cd
                 break;
@@ -90,7 +92,14 @@ int main(void) {
     return 0;
 }
 
-int parseCommandString(const std::string &userCommand, std::string strArr[]) {
+void ClearCommandArr(std::string *commandArr)
+{
+	for (int i = 0; i < MAXCOMMANDS; i++)
+		commandArr[i] = "";
+	return;
+}
+
+int ParseCommandString(const std::string &userCommand, std::string strArr[]) {
     
     std::stringstream ssin(userCommand);
     int counter = 0;
@@ -104,7 +113,7 @@ int parseCommandString(const std::string &userCommand, std::string strArr[]) {
     }
     return counter;
 }
-int findCommand(std::string &command) {
+int FindCommand(std::string &command) {
     int index = -1;
     for (int i = 0; i < NUMAVAILABLECOMMANDS && index == -1; ++i) {
 

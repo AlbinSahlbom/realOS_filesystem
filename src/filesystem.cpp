@@ -6,6 +6,12 @@ FileSystem::FileSystem() {
 	this->currentDirectory.blockNr = -5;
 	this->currentDirectory.nbrOfKids = 0;
 	this->currentDirectory.directoryName = '/';
+
+	this->root.parent = nullptr;
+	this->root.kids = nullptr;
+	this->root.blockNr = -5;
+	this->root.nbrOfKids = 0;
+	this->root.directoryName = "/";
 }
 
 FileSystem::~FileSystem() {
@@ -49,17 +55,31 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 
 int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 {
-	std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
+	int result = -5;
+	
 
-	for (int i = 0; i < dirPath.length(); i++)
+	if (dirPath == "")
 	{
+		for (int i = 0; i < currentDirectory.nbrOfKids; i++)
+		{
+			std::cout << currentDirectory.kids[i]->directoryName << std::endl;
+			result = 0;
+		}
+	}
+	else
+	{
+		std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
 		if (dirPath[0] == '/')
 		{
 			//Absolut path
-
+			result = CheckKidsListDir(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
+		}
+		else
+		{
+			result = CheckKidsListDir(&this->currentDirectory, dirs, 0);
 		}
 	}
-	return 0;
+	return result;
 }
 
 int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index)
@@ -157,7 +177,7 @@ std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
 			temp += dirPath[i];
 		}
 	}
-	return std::vector<std::string>();
+	return dirs;
 }
 
 int FileSystem::CreateFile(std::string filePath, std::string currentDir)
@@ -174,6 +194,7 @@ int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
 	int result = -5;
 
 	dirs = ConvertDirPathToVector(dirPath);
+
 	//for (unsigned int i = 0; i <= dirPath.length(); i++)
 	//{
 	//	if(dirPath[i] == '/')
@@ -191,10 +212,10 @@ int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
 	//		temp += dirPath[i];
 	//	}
 	//}
-	if(dirPath[0]=='/')
+	if(dirPath[0] == '/')
 	{
 		//Absolut path
-		result = CheckKidsMakeDir(&root, dirs, 1);
+		result = CheckKidsMakeDir(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
 		std::cout << "Check kids result: " << result << std::endl;
 	}
 	else
