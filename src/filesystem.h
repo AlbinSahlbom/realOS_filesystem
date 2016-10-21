@@ -10,6 +10,9 @@ class FileSystem
 {
 private:
     MemBlockDevice mMemblockDevice;
+	int* allBlockNbrs;
+	int nbrOfBlocks;
+	int TakeFirstFreeBlockNbr();
     // Here you can add your own data structures
     struct node
     {
@@ -18,14 +21,13 @@ private:
         node** kids;
         node* parent;
         int blockNr;    //-5 if dir otherwhise 0-249 for blocks
-    } root, currentDirectory;
+    } root;
+	node * currentDirectory;
 
     void CreateNewNode(std::string dirName, node* parent);
 
-    node FindDir(std::string path);
-    node ChangeDir(std::string path);
 public:
-    FileSystem();
+	FileSystem(int nbrOfBlocks);
     ~FileSystem();
 
     /* These commands needs to implemented
@@ -51,12 +53,16 @@ public:
     /* This function will get all the files and folders in the specified folder */
     int ListDir(std::string dirPath, std::string currentDir);
 
+	/* This function will return the absolut path to the working directory*/
+	int GetCurrentWorkingDirectory();
 
 
     /* Add your own member-functions if needed */
+private:
     int CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
 	int CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
 	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);
+	int GetParents(std::vector<std::string> *parents, node *currentNode);
 };
 
 #endif // FILESYSTEM_H

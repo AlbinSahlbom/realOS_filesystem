@@ -18,7 +18,8 @@ void ClearCommandArr(std::string *commandArr);
 std::string help();
 
 int main(void) {
-    FileSystem* fileSystem = new FileSystem();		//Delete this when program quits
+	const int nbrOfBlocks = 250;
+    FileSystem* fileSystem = new FileSystem(nbrOfBlocks);		//Delete this when program quits
 
 	std::string userCommand, commandArr[MAXCOMMANDS];
 	std::string user = "user@DV1492";    // Change this if you want another user to be displayed
@@ -79,6 +80,11 @@ int main(void) {
             case 12: // cd
                 break;
             case 13: // pwd
+				if (fileSystem->GetCurrentWorkingDirectory() == -5)
+				{
+					std::cout << "Something went wrong" << std::endl;
+				}
+				ClearCommandArr(commandArr);
                 break;
             case 14: // help
                 std::cout << help() << std::endl;

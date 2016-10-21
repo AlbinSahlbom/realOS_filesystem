@@ -1,21 +1,39 @@
 #include "filesystem.h"
 
-FileSystem::FileSystem() {
-	this->currentDirectory.parent = nullptr;
-	this->currentDirectory.kids = nullptr;
-	this->currentDirectory.blockNr = -5;
-	this->currentDirectory.nbrOfKids = 0;
-	this->currentDirectory.directoryName = '/';
-
+FileSystem::FileSystem(int nbrOfBlocks) {
 	this->root.parent = nullptr;
 	this->root.kids = nullptr;
 	this->root.blockNr = -5;
 	this->root.nbrOfKids = 0;
 	this->root.directoryName = "/";
+
+	this->currentDirectory = &this->root;
+
+	this->allBlockNbrs = new int[nbrOfBlocks];
+	this->nbrOfBlocks = nbrOfBlocks;
+	for (int i = 0; i < nbrOfBlocks; i++)
+	{
+		this->allBlockNbrs[i] = i;
+	}
 }
 
 FileSystem::~FileSystem() {
+	delete[] this->allBlockNbrs;
+}
 
+int FileSystem::TakeFirstFreeBlockNbr()
+{
+	int firstFreeBlock = -5;
+	for (int i = 0; i < this->nbrOfBlocks; i++)
+	{
+		if (this->allBlockNbrs[i] == i)
+		{
+			firstFreeBlock = i;
+			this->allBlockNbrs[i] = -5;//use number
+			i = this->nbrOfBlocks;//break loop
+		}
+	}
+	return firstFreeBlock;
 }
 
 void FileSystem::CreateNewNode(std::string dirName, node* parent)
@@ -59,9 +77,9 @@ int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 
 	if (dirPath == "")
 	{
-		for (int i = 0; i < currentDirectory.nbrOfKids; i++)
+		for (int i = 0; i < currentDirectory->nbrOfKids; i++)
 		{
-			std::cout << currentDirectory.kids[i]->directoryName << std::endl;
+			std::cout << currentDirectory->kids[i]->directoryName << std::endl;
 			result = 0;
 		}
 	}
@@ -84,9 +102,25 @@ int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 		}
 		else
 		{
-			result = CheckKidsListDir(&currentDirectory, dirs, 0);
+			result = CheckKidsListDir(currentDirectory, dirs, 0);
 		}
 	}
+	return result;
+}
+
+int FileSystem::GetCurrentWorkingDirectory()
+{
+	int result = -5;
+	std::vector<std::string> parents;
+	
+	result = GetParents(&parents, currentDirectory);
+	std::cout << parents[0];
+	for (int i = 1; i < parents.size(); i++)
+	{
+		std::cout << parents[i] << "/";
+	}
+	std::cout << std::endl;
+
 	return result;
 }
 
@@ -229,10 +263,24 @@ int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
 	}
 	else
 	{
-		result = CheckKidsMakeDir(&this->currentDirectory, dirs, 0);
+		result = CheckKidsMakeDir(this->currentDirectory, dirs, 0);
 		std::cout << "Check kids result: " <<  result << std::endl;
 	}
 	return result;
 }
 
-
+int FileSystem::GetParents(std::vector<std::string> *parents, node *currentNode)
+{
+	int result = -5;
+	if (currentNode->directoryName == "/")
+	{
+		parents->push_back(currentNode->directoryName);
+		result = 0;
+	}
+	else
+	{
+		result = GetParents(parents, currentNode->parent);
+		parents->push_back(currentNode->directoryName);
+	}
+	return result;
+}
