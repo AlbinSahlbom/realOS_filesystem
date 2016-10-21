@@ -18,7 +18,8 @@ void ClearCommandArr(std::string *commandArr);
 std::string help();
 
 int main(void) {
-    FileSystem* fileSystem = new FileSystem();		//Delete this when program quits
+	const int nbrOfBlocks = 250;
+    FileSystem* fileSystem = new FileSystem(nbrOfBlocks);		//Delete this when program quits
 
 	std::string userCommand, commandArr[MAXCOMMANDS];
 	std::string user = "user@DV1492";    // Change this if you want another user to be displayed
@@ -70,13 +71,19 @@ int main(void) {
                 break;
             case 11: // mkdir	//Klar
                 std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
-                if(fileSystem->MakeDirectory(commandArr[1], currentDir) == -5)
+                if(fileSystem->MakeDirectory(commandArr[1]) == -5)
                 {
                     std::cout << "mkdir: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
                 }
 				ClearCommandArr(commandArr);
                 break;
             case 12: // cd
+				std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
+				if (fileSystem->GoToDirectory(commandArr[1]) == -5)
+				{
+					std::cout << "cd: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
+				}
+				ClearCommandArr(commandArr);
                 break;
             case 13: // pwd
                 break;

@@ -10,6 +10,9 @@ class FileSystem
 {
 private:
     MemBlockDevice mMemblockDevice;
+	int* allBlockNbrs;
+	int nbrOfBlocks;
+	int TakeFirstFreeBlockNbr();
     // Here you can add your own data structures
     struct node
     {
@@ -18,14 +21,14 @@ private:
         node** kids;
         node* parent;
         int blockNr;    //-5 if dir otherwhise 0-249 for blocks
-    } root, currentDirectory;
+	} root;
+	node * currentDirectory;
 
     void CreateNewNode(std::string dirName, node* parent);
 
-    node FindDir(std::string path);
-    node ChangeDir(std::string path);
+	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index);//cd
 public:
-    FileSystem();
+    FileSystem(int nbrOfBlocks);
     ~FileSystem();
 
     /* These commands needs to implemented
@@ -34,19 +37,22 @@ public:
      */
 
     /* This function creates a file in the filesystem */
-    int CreateFile(std::string filePath, std::string currentDir);
+	int CheckKidsMakeFile(node *currentNode, std::vector<std::string> dirs, unsigned int index);
+    int CreateFile(std::string filePath);
     
     /* Creates a folder in the filesystem */
-    int MakeDirectory(std::string dirPath, std::string currentDir);
+    int MakeDirectory(std::string dirPath);
+
+	/* Copy file to a selected folder*/
 
     /* Removes a file in the filesystem */
     // removeFile(...);
 
     /* Removes a folder in the filesystem */
-    // removeFolder(...);
+    int RemoveFolder(std::string dirPath, std::string currentDir);
 
     /* Function will move the current location to a specified location in the filesystem */
-    // goToFolder(...);
+    int GoToDirectory(std::string dirPath);//cd
 
     /* This function will get all the files and folders in the specified folder */
     int ListDir(std::string dirPath, std::string currentDir);
