@@ -45,7 +45,7 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 	newNode->nbrOfKids = 0;
 	newNode->blockNr = -5;
 
-	if (parent->nbrOfKids == 0)
+	if (parent->nbrOfKids == 1)
 	{
 		parent->kids = new node*[1];
 		parent->kids[0] = newNode;
@@ -80,7 +80,7 @@ int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 		for (int i = 0; i < currentDirectory->nbrOfKids; i++)
 		{
 			std::cout << currentDirectory->kids[i]->directoryName << std::endl;
-			result = 0;
+			result = 1;
 		}
 	}
 	else
@@ -97,7 +97,7 @@ int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 			for (int i = 0; i < root.nbrOfKids; i++)
 			{
 				std::cout << root.kids[i]->directoryName << std::endl;
-				result = 0;
+				result = 1;
 			}
 		}
 		else
@@ -112,14 +112,14 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 {
 	int result = -5;
 
-	if (dirs.size() -1 == index && currentNode->nbrOfKids == 0)
+	if (dirs.size() -1 == index && currentNode->nbrOfKids == 1)
 	{
 		//skapa mapp
 		std::cout << "skapa mapp 1" << std::endl;
 		//Skapamappfunktion
 		CreateNewNode(dirs[index], currentNode);
 
-		result = 0;
+		result = 1;
 	}
 	else
 	{
@@ -128,7 +128,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 		{
 			if (dirs.size() - 1 > index)
 			{
-				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 1)
 				{
 					index = index +1;
 					std::cout << "Dirs size index: " << dirs.size() << " Index: " << index << std::endl;
@@ -140,7 +140,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 			else //in last folder
 			{
 				//om mappen redan finns
-				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 1)
 				{
 					std::cout << "Kid found" << std::endl;
 					k = currentNode->nbrOfKids;//exit loop
@@ -152,7 +152,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 		{
 			std::cout << "Skapa mapp 2" << std::endl;
 			CreateNewNode(dirs[index],currentNode);
-			result = 0;
+			result = 1;
 		}
 	}
 	return result;
@@ -164,16 +164,16 @@ int FileSystem::CheckKidsListDir(node *currentNode, std::vector<std::string> dir
 
 	for (int  i = 0; i < currentNode->nbrOfKids; i++)
 	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)
 		{
 			for (int k = 0; i < currentNode->kids[i]->nbrOfKids; i++)
 			{
 				std::cout << currentNode->kids[i]->kids[k]->directoryName << std::endl;
 			}
 			i = currentNode->nbrOfKids;
-			result = 0;
+			result = 1;
 		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)
 		{
 			result = CheckKidsListDir(currentNode->kids[i], dirs, index++);
 		}
@@ -258,7 +258,7 @@ int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> 
 	int result = -5;
 	for (int i = 0; i < currentNode->nbrOfKids; i++)
 	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//last folder in searchpath
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)//last folder in searchpath
 		{
 			//dir exists, set current directory to point at the dir found
 			this->currentDirectory = currentNode->kids[i];
@@ -268,7 +268,7 @@ int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> 
 			i = currentNode->nbrOfKids;//exit loop
 			result = 1;
 		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//search for kids, if found use function recursively
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)//search for kids, if found use function recursively
 		{
 			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
 		}
