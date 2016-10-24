@@ -53,7 +53,7 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
                 break;
-            case 3: // create
+            case 3: // create	//Vulkan fixar
                 break;
             case 4: // cat
                 break;
@@ -77,13 +77,18 @@ int main(void) {
                 }
 				ClearCommandArr(commandArr);
                 break;
-            case 12: // cd
+            case 12: // cd		//Vulkan fixar
                 break;
             case 13: // pwd
+
+				std::cout << currentDir << std::endl;
+
+				/*
 				if (fileSystem->GetCurrentWorkingDirectory() == -5)
 				{
 					std::cout << "Something went wrong" << std::endl;
-				}
+				}*/
+
 				ClearCommandArr(commandArr);
                 break;
             case 14: // help
