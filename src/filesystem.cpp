@@ -108,22 +108,6 @@ int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 	return result;
 }
 
-int FileSystem::GetCurrentWorkingDirectory()
-{
-	int result = -5;
-	std::vector<std::string> parents;
-	
-	result = GetParents(&parents, currentDirectory);
-	std::cout << parents[0];
-	for (int i = 1; i < parents.size(); i++)
-	{
-		std::cout << parents[i] << "/";
-	}
-	std::cout << std::endl;
-
-	return result;
-}
-
 int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index)
 {
 	int result = -5;
@@ -269,18 +253,58 @@ int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
 	return result;
 }
 
-int FileSystem::GetParents(std::vector<std::string> *parents, node *currentNode)
+int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index)//moves the "currentDir" pointer to requested destination
 {
 	int result = -5;
-	if (currentNode->directoryName == "/")
+	for (int i = 0; i < currentNode->nbrOfKids; i++)
 	{
-		parents->push_back(currentNode->directoryName);
-		result = 0;
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//last folder in searchpath
+		{
+			//dir exists, set current directory to point at the dir found
+			this->currentDirectory = currentNode->kids[i];
+
+
+
+			i = currentNode->nbrOfKids;//exit loop
+			result = 1;
+		}
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//search for kids, if found use function recursively
+		{
+			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
+		}
+	}
+	return result;
+}
+
+int FileSystem::GoToDirectory(std::string dirPath, std::string &currentWorkDir)	//cd
+{
+	std::vector<std::string> dirs;
+
+	std::cout << "CD called" << std::endl;
+	int result = -5;
+
+	dirs = ConvertDirPathToVector(dirPath);
+
+
+	if (dirPath[0] == '/')
+	{
+		//Absolut path
+		result = SetCurrentDirByPath(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
+		if (result == 1)
+		{
+			currentWorkDir = "/" + dirPath + "/";
+		}
+		std::cout << "Absolute path: " << result << std::endl;
 	}
 	else
 	{
-		result = GetParents(parents, currentNode->parent);
-		parents->push_back(currentNode->directoryName);
+		result = SetCurrentDirByPath(this->currentDirectory, dirs, 0);
+		if (result == 1)
+		{
+			currentWorkDir += dirPath + "/";
+		}
+		std::cout << "Path: " << result << std::endl;
 	}
+
 	return result;
 }

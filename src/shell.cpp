@@ -37,7 +37,6 @@ int main(void) {
 
             int cIndex = FindCommand(commandArr[0]);
             switch(cIndex) {
-
             case 0: // quit
                 bRun = false;
                 std::cout << "Exiting\n" << std::endl;
@@ -70,25 +69,28 @@ int main(void) {
             case 10: // mv
                 break;
             case 11: // mkdir	//Klar
-                std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
-                if(fileSystem->MakeDirectory(commandArr[1], currentDir) == -5)
-                {
-                    std::cout << "mkdir: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
-                }
-				ClearCommandArr(commandArr);
-                break;
-            case 12: // cd		//Vulkan fixar
-                break;
-            case 13: // pwd
-
-				std::cout << currentDir << std::endl;
-
-				/*
-				if (fileSystem->GetCurrentWorkingDirectory() == -5)
+			{
+				std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
+				if (fileSystem->MakeDirectory(commandArr[1], currentDir) == -5)
 				{
-					std::cout << "Something went wrong" << std::endl;
-				}*/
-
+					std::cout << "mkdir: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
+				}
+				ClearCommandArr(commandArr);
+				break;
+			}
+            case 12: // cd		//Vulkan fixar
+			{
+				std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
+				if (fileSystem->GoToDirectory(commandArr[1], currentDir) == -5)
+				{
+					std::cout << "cd: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
+					break;
+				}
+				ClearCommandArr(commandArr);
+				break;
+			}
+            case 13: // pwd
+				std::cout << currentDir << std::endl;
 				ClearCommandArr(commandArr);
                 break;
             case 14: // help

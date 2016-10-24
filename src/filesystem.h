@@ -24,7 +24,7 @@ private:
     } root;
 	node * currentDirectory;
 
-    void CreateNewNode(std::string dirName, node* parent);
+    
 
 public:
 	FileSystem(int nbrOfBlocks);
@@ -48,21 +48,21 @@ public:
     // removeFolder(...);
 
     /* Function will move the current location to a specified location in the filesystem */
-    // goToFolder(...);
+	int GoToDirectory(std::string dirPath, std::string &currentWorkDir);//cd
 
     /* This function will get all the files and folders in the specified folder */
     int ListDir(std::string dirPath, std::string currentDir);
 
 	/* This function will return the absolut path to the working directory*/
-	int GetCurrentWorkingDirectory();
 
 
     /* Add your own member-functions if needed */
 private:
-    int CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
-	int CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
-	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);
-	int GetParents(std::vector<std::string> *parents, node *currentNode);
+	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);							//Used by all
+	void CreateNewNode(std::string dirName, node* parent);											//mkdir
+    int CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);		//mkdir
+	int CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);		//ls
+	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index);	//cd
 };
 
 #endif // FILESYSTEM_H
