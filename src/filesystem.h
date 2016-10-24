@@ -16,7 +16,7 @@ private:
     // Here you can add your own data structures
     struct node
     {
-        std::string directoryName;
+        std::string directoryName;//Dirname or file name
         unsigned int nbrOfKids;
         node** kids;
         node* parent;
@@ -24,7 +24,7 @@ private:
 	} root;
 	node * currentDirectory;
 
-    void CreateNewNode(std::string dirName, node* parent);
+    void CreateNewNode(std::string dirName, node* parent, int blockNr);
 
 	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index);//cd
 public:
@@ -37,7 +37,7 @@ public:
      */
 
     /* This function creates a file in the filesystem */
-	int CheckKidsMakeFile(node *currentNode, std::vector<std::string> dirs, unsigned int index);
+	int CheckKidsMakeFile(node *currentNode, std::vector<std::string> dirs, unsigned int index, int blockNr);
     int CreateFile(std::string filePath);
     
     /* Creates a folder in the filesystem */
@@ -55,7 +55,7 @@ public:
     int GoToDirectory(std::string dirPath);//cd
 
     /* This function will get all the files and folders in the specified folder */
-    int ListDir(std::string dirPath, std::string currentDir);
+    int ListDir(std::string dirPath);
 
 
 

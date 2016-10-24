@@ -47,13 +47,19 @@ int main(void) {
                 break;
             case 2: // ls
                 std::cout << "Listing directory" << std::endl;
-				if (fileSystem->ListDir(commandArr[1], currentDir) == -5)
+				if (fileSystem->ListDir(commandArr[1]) == -5)
 				{
 					std::cout << "ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
 				}
 				ClearCommandArr(commandArr);
                 break;
             case 3: // create
+				std::cout << "Create file" << std::endl;
+				if (fileSystem->CreateFile(commandArr[1]) == -5)
+				{
+					std::cout << "ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
+				}
+				ClearCommandArr(commandArr);
                 break;
             case 4: // cat
                 break;

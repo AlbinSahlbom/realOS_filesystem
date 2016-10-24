@@ -41,14 +41,14 @@ int FileSystem::TakeFirstFreeBlockNbr()
 	return firstFreeBlock;
 }
 
-void FileSystem::CreateNewNode(std::string dirName, node* parent)
+void FileSystem::CreateNewNode(std::string dirName, node* parent, int blockNr)
 {
 	node *newNode = new node;
 	newNode->directoryName = dirName;
 	newNode->parent = parent;
 	newNode->kids = nullptr;
 	newNode->nbrOfKids = 0;
-	newNode->blockNr = -5;
+	newNode->blockNr = blockNr;
 
 	if (parent->nbrOfKids == 0)
 	{
@@ -76,7 +76,7 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 }
 
 
-int FileSystem::ListDir(std::string dirPath, std::string currentDir)
+int FileSystem::ListDir(std::string dirPath)
 {
 	int result = -5;
 
@@ -122,7 +122,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 		//skapa mapp
 		std::cout << "skapa mapp 1" << std::endl;
 		//Skapamappfunktion
-		CreateNewNode(dirs[index], currentNode);
+		CreateNewNode(dirs[index], currentNode, -5);//send -5 if directory
 
 		result = 0;
 	}
@@ -156,7 +156,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 		if (!madeDir)
 		{
 			std::cout << "Skapa mapp 2" << std::endl;
-			CreateNewNode(dirs[index],currentNode);
+			CreateNewNode(dirs[index],currentNode,-5);//send -5 if directory
 			result = 0;
 		}
 	}
@@ -212,7 +212,7 @@ std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
 	return dirs;
 }
 
-int FileSystem::CheckKidsMakeFile(node *currentNode, std::vector<std::string> dirs, unsigned int index)
+int FileSystem::CheckKidsMakeFile(node *currentNode, std::vector<std::string> dirs, unsigned int index, int blockNr)
 {
 	int result = -5;
 	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)
@@ -220,7 +220,7 @@ int FileSystem::CheckKidsMakeFile(node *currentNode, std::vector<std::string> di
 		//skapa mapp
 		std::cout << "skapa fil 1" << std::endl;
 		//Skapamappfunktion
-		CreateNewNode(dirs[index], currentNode);
+		CreateNewNode(dirs[index], currentNode, blockNr);
 
 		result = 0;
 	}
@@ -235,14 +235,14 @@ int FileSystem::CheckKidsMakeFile(node *currentNode, std::vector<std::string> di
 				{
 					index = index + 1;
 					std::cout << "Dirs size index: " << dirs.size() << " Index: " << index << std::endl;
-					result = CheckKidsMakeFile(currentNode->kids[k], dirs, index);
+					result = CheckKidsMakeFile(currentNode->kids[k], dirs, index, blockNr);
 					k = currentNode->nbrOfKids;//exit loop
 					madeDir = true;
 				}
 			}
 			else //in last folder
 			{
-				//om mappen redan finns
+				//om noden redan finns
 				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
 				{
 					std::cout << "Kid found" << std::endl;
@@ -254,7 +254,7 @@ int FileSystem::CheckKidsMakeFile(node *currentNode, std::vector<std::string> di
 		if (!madeDir)
 		{
 			std::cout << "Skapa mapp 2" << std::endl;
-			CreateNewNode(dirs[index], currentNode);
+			CreateNewNode(dirs[index], currentNode, blockNr);
 			result = 0;
 		}
 	}
@@ -264,6 +264,7 @@ int FileSystem::CheckKidsMakeFile(node *currentNode, std::vector<std::string> di
 int FileSystem::CreateFile(std::string filePath)
 {
 	int result = -5;
+	int blockNr = this->TakeFirstFreeBlockNbr();
 
 	std::vector<std::string> dirs;
 	//std::string temp = "";
@@ -275,12 +276,12 @@ int FileSystem::CreateFile(std::string filePath)
 	if (filePath[0] == '/')
 	{
 		//Absolute path
-		result = CheckKidsMakeDir(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
+		result = CheckKidsMakeFile(&root, dirs, 1, blockNr);		//Sending 1 as index because 0 is "/"
 		std::cout << "Check kids result: " << result << std::endl;
 	}
 	else
 	{
-		result = CheckKidsMakeDir(this->currentDirectory, dirs, 0);
+		result = CheckKidsMakeFile(this->currentDirectory, dirs, 0, blockNr);
 		std::cout << "Check kids result: " << result << std::endl;
 	}
 
@@ -324,7 +325,7 @@ int FileSystem::RemoveFolder(std::string dirPath, std::string currentDir)
 
 
 
-int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index)
+int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index)//moves the "currentDir" pointer to requested destination
 {
 	int result = -5;
 	for (int i = 0; i < currentNode->nbrOfKids; i++)
@@ -344,7 +345,7 @@ int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> 
 	return result;
 }
 
-int FileSystem::GoToDirectory(std::string dirPath)
+int FileSystem::GoToDirectory(std::string dirPath)//CD
 {
 	std::vector<std::string> dirs;
 	std::cout << "CD called" << std::endl;
