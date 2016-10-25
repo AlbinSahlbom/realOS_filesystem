@@ -13,6 +13,7 @@ private:
 	int* allBlockNbrs;
 	int nbrOfBlocks;
 	int TakeFirstFreeBlockNbr();
+
     // Here you can add your own data structures
     struct node
     {
@@ -24,16 +25,19 @@ private:
     } root;
 	node * currentDirectory;
 
-    
+	node allNodes[250];
 
 public:
 	FileSystem(int nbrOfBlocks);
     ~FileSystem();
-
+	
     /* These commands needs to implemented
      *
      * However, you are free to change the parameterlist and specify your own returntype for each function below.
      */
+
+	/* Build an empty filesystem*/
+	int FormatSystem();
 
     /* This function creates a file in the filesystem */
     int CreateFile(std::string filePath, std::string currentDir);
@@ -42,10 +46,10 @@ public:
     int MakeDirectory(std::string dirPath, std::string currentDir);
 
     /* Removes a file in the filesystem */
-    // removeFile(...);
+	int rmFile(std::string fileToRemove);
 
     /* Removes a folder in the filesystem */
-    // removeFolder(...);
+	int rmDir(std::string dirToRemove);
 
     /* Function will move the current location to a specified location in the filesystem */
 	int GoToDirectory(std::string dirPath, std::string &currentWorkDir);//cd
@@ -63,6 +67,13 @@ private:
     int CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);		//mkdir
 	int CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);		//ls
 	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index);	//cd
+
+
+	int DeleteNode(node *nodeToBeDeleted);
+	int DeleteFileBlock(int fileBlockToDelete);
+	int DeleteDir(node *currentNode, int kidNbr);
+	int RemoveFolder(node *currentNode, int kidNbr);
+	int RemoveFile(node *currentNode, int kidNbr, int fileBlock);
 };
 
 #endif // FILESYSTEM_H

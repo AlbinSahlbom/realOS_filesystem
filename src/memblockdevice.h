@@ -34,6 +34,9 @@ public:
 
     /* Return the size */
     int size() const;
+
+	/* Deletes a block */
+	int DeleteBlock(int blockToDelete);
 };
 
 #endif // MEMBLOCKDEVICE_H

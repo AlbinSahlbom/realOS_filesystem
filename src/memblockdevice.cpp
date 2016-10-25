@@ -105,6 +105,12 @@ int MemBlockDevice::size() const {
     return this->nrOfBlocks;
 }
 
+int MemBlockDevice::DeleteBlock(int blockToDelete)
+{
+	delete &this->memBlocks[blockToDelete];
+	return 1;
+}
+
 int MemBlockDevice::TakeFirstFreeBlockNbr()
 {
     int firstFreeBlock = -5;

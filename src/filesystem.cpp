@@ -1,6 +1,7 @@
 #include "filesystem.h"
 
 FileSystem::FileSystem(int nbrOfBlocks) {
+	FormatSystem();
 	this->root.parent = nullptr;
 	this->root.kids = nullptr;
 	this->root.blockNr = -5;
@@ -70,6 +71,24 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 	return;
 }
 
+
+int FileSystem::FormatSystem()
+{
+	int result = -5;
+	for (int i = 0; i < 250; i++)
+	{
+		this->allNodes[i].blockNr = i;
+		this->allNodes[i].directoryName = "";
+		this->allNodes[i].kids = nullptr;
+		this->allNodes[i].nbrOfKids = 0;
+		this->allNodes[i].parent = nullptr;
+	}
+
+	/*Delete the whole filesystem*/
+	result = DeleteNode(&root);
+
+	return result;
+}
 
 int FileSystem::ListDir(std::string dirPath, std::string currentDir)
 {
@@ -253,6 +272,55 @@ int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
 	return result;
 }
 
+int FileSystem::rmFile(std::string fileToRemove)
+{
+	int result = -5;
+	for (int i = 0; i < currentDirectory->nbrOfKids; i++)
+	{
+		if (currentDirectory->kids[i]->directoryName == fileToRemove)
+		{
+			result = RemoveFile(currentDirectory, i, currentDirectory->kids[i]->blockNr);
+			i = currentDirectory->nbrOfKids;
+		}
+	}
+
+	return result;
+}
+
+int FileSystem::rmDir(std::string dirToRemove)
+{
+	int result = -5;
+	for (int i = 0; i < currentDirectory->nbrOfKids; i++)
+	{
+		if (currentDirectory->kids[i]->directoryName == dirToRemove && currentDirectory->kids[i]->blockNr == -5)
+		{
+			result = RemoveFolder(currentDirectory, i);
+			i = currentDirectory->nbrOfKids;
+		}
+	}
+	return result;
+}
+
+int FileSystem::RemoveFile(node *currentNode, int kidNbr, int fileBlock)
+{
+	int result = -5;
+	result = DeleteFileBlock(currentNode->blockNr);
+	currentNode->parent->nbrOfKids--;
+	delete currentNode->kids[kidNbr];
+	return result;
+}
+
+int FileSystem::RemoveFolder(node *currentNode, int kidNbr)
+{
+	int result = -5;
+
+	result = DeleteNode(currentNode);
+
+	delete currentNode;
+
+	return result;
+}
+
 int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index)//moves the "currentDir" pointer to requested destination
 {
 	int result = -5;
@@ -305,6 +373,47 @@ int FileSystem::GoToDirectory(std::string dirPath, std::string &currentWorkDir)	
 		}
 		std::cout << "Path: " << result << std::endl;
 	}
+
+	return result;
+}
+
+int FileSystem::DeleteNode(node *nodeToBeDeleted)
+{
+
+	int result = -5;
+	for (int i = 0; i < nodeToBeDeleted->nbrOfKids; i++)
+	{
+		if (nodeToBeDeleted->kids[i]->blockNr != -5)
+		{
+			result = RemoveFile(nodeToBeDeleted, i, nodeToBeDeleted->kids[i]->blockNr);
+			i--;
+		}
+		else if (nodeToBeDeleted->kids[i]->nbrOfKids == 0)
+		{
+			result = RemoveFolder(nodeToBeDeleted, i);
+			i--;
+		}
+		else
+		{
+			result = DeleteNode(nodeToBeDeleted->kids[i]);
+			i--;
+		}
+	}
+	return result;
+}
+
+int FileSystem::DeleteFileBlock(int fileBlockToDelete)
+{
+	int result = -5;
+	result = mMemblockDevice.DeleteBlock(fileBlockToDelete);
+	return result;
+}
+
+int FileSystem::DeleteDir(node * currentNode, int kidNbr)
+{
+	int result = 1;
+	currentNode->parent->nbrOfKids--;
+	delete currentNode->kids[kidNbr];
 
 	return result;
 }
