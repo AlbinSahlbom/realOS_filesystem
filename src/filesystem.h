@@ -37,7 +37,7 @@ public:
      */
 
 	/* Build an empty filesystem*/
-	int FormatSystem();
+	int Format();
 
     /* This function creates a file in the filesystem */
     int CreateFile(std::string filePath, std::string currentDir);

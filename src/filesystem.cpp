@@ -72,7 +72,7 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 }
 
 
-int FileSystem::FormatSystem()
+int FileSystem::Format()
 {
 	int result = -5;
 	for (int i = 0; i < 250; i++)

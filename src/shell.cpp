@@ -4,11 +4,11 @@
 #include "filesystem.h"
 
 const int MAXCOMMANDS = 8;
-const int NUMAVAILABLECOMMANDS = 15;
+const int NUMAVAILABLECOMMANDS = 16;
 
 std::string availableCommands[NUMAVAILABLECOMMANDS] = {
     "quit","format","ls","create","cat","createImage","restoreImage",
-    "rm","cp","append","mv","mkdir","cd","pwd","help"
+    "rmFile","rmDir","cp","append","mv","mkdir","cd","pwd","help"
 };
 
 /* Takes usercommand from input and returns number of commands, commands are stored in strArr[] */
@@ -41,8 +41,8 @@ int main(void) {
                 bRun = false;
                 std::cout << "Exiting\n" << std::endl;
                 break;
-            case 1: // format				//Fixa
-                // Call fileSystem.format()
+            case 1: // format				//Klar
+				fileSystem->Format();
                 break;
             case 2: // ls					//Klar
                 std::cout << "Listing directory" << std::endl;
@@ -52,23 +52,27 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
                 break;
-            case 3: // create				//Vulkan fixar
+            case 3: // create				//Klar
                 break;
-            case 4: // cat					//Vulkan fixar
+            case 4: // cat					//Klar
                 break;
             case 5: // createImagecd		//Fixa
                 break;
             case 6: // restoreImage			//Fixa
                 break;
-            case 7: // rm					//Fixa
+            case 7: // rmFile				//Klar
+				fileSystem->rmFile(commandArr[1]);
                 break;
-            case 8: // cp					//Fixa
+			case 8:	// rmDir				//Klar
+				fileSystem->rmDir(commandArr[1]);
+				break;
+            case 9: // cp					//Fixa
                 break;
-            case 9: // append				//Behover inte ha med
+            case 10: // append				//Behover inte ha med
                 break;
-            case 10: // mv					//Behover inte ha med
+            case 11: // mv					//Behover inte ha med
                 break;
-            case 11: // mkdir				//Klar
+            case 12: // mkdir				//Klar
 			{
 				std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
 				if (fileSystem->MakeDirectory(commandArr[1], currentDir) == -5)
@@ -78,7 +82,7 @@ int main(void) {
 				ClearCommandArr(commandArr);
 				break;
 			}
-            case 12: // cd					//Klar
+            case 13: // cd					//Klar
 			{
 				std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
 				if (fileSystem->GoToDirectory(commandArr[1], currentDir) == -5)
@@ -89,11 +93,11 @@ int main(void) {
 				ClearCommandArr(commandArr);
 				break;
 			}
-            case 13: // pwd					//Klar
+            case 14: // pwd					//Klar
 				std::cout << currentDir << std::endl;
 				ClearCommandArr(commandArr);
                 break;
-            case 14: // help
+            case 15: // help
                 std::cout << help() << std::endl;
                 break;
             default:
