@@ -27,6 +27,7 @@ private:
     void CreateNewNode(std::string dirName, node* parent, int blockNr);
 
 	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index);//cd
+	int CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> dirs, unsigned int index);//returns the blocknumber of a file
 public:
     FileSystem(int nbrOfBlocks);
     ~FileSystem();
@@ -38,7 +39,8 @@ public:
 
     /* This function creates a file in the filesystem */
 	int CheckKidsMakeFile(node *currentNode, std::vector<std::string> dirs, unsigned int index, int blockNr);
-    int CreateFile(std::string filePath);
+    int CreateFile(std::string filePath, std::string fileContent);
+	std::string GetFileContent(std::string filePath);
     
     /* Creates a folder in the filesystem */
     int MakeDirectory(std::string dirPath);

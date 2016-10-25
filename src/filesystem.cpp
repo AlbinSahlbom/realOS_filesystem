@@ -186,6 +186,48 @@ int FileSystem::CheckKidsListDir(node *currentNode, std::vector<std::string> dir
 	return result;
 }
 
+int FileSystem::CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> dirs, unsigned int index)
+{
+	int result = -5;
+
+	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)
+	{
+		
+		result = -5;
+	}
+	else
+	{
+		for (unsigned int k = 0; k < currentNode->nbrOfKids; k++)
+		{
+			if (dirs.size() - 1 > index)
+			{
+				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				{
+					index = index + 1;
+					std::cout << "Dirs size index: " << dirs.size() << " Index: " << index << std::endl;
+					result = CheckKidsMakeDir(currentNode->kids[k], dirs, index);
+					k = currentNode->nbrOfKids;//exit loop
+					
+				}
+			}
+			else //in last folder
+			{
+				//om mappen redan finns
+				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				{
+					std::cout << "Kid found" << std::endl;
+					
+					result = currentNode->kids[k]->blockNr;
+					
+					k = currentNode->nbrOfKids;//exit loop
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
 std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
 {
 	std::vector<std::string> dirs;
@@ -261,7 +303,7 @@ int FileSystem::CheckKidsMakeFile(node *currentNode, std::vector<std::string> di
 	return result;
 }
 
-int FileSystem::CreateFile(std::string filePath)
+int FileSystem::CreateFile(std::string filePath, std::string fileContent)
 {
 	int result = -5;
 	int blockNr = this->TakeFirstFreeBlockNbr();
@@ -285,8 +327,41 @@ int FileSystem::CreateFile(std::string filePath)
 		std::cout << "Check kids result: " << result << std::endl;
 	}
 
+	if (result != -5)
+	{
+		this->mMemblockDevice.writeBlock(blockNr, fileContent);
+	}
+
 	return result;
 }
+
+std::string FileSystem::GetFileContent(std::string filePath)
+{
+	std::string content = "File not found";
+	int result = -5;
+	std::vector<std::string> dirs;
+	dirs = ConvertDirPathToVector(filePath);
+
+	if (filePath[0] == '/')
+	{
+		//Absolut path
+		result = CheckKidsFindBlockNr(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
+		std::cout << "Check kids result: " << result << std::endl;
+	}
+	else
+	{
+		result = CheckKidsFindBlockNr(this->currentDirectory, dirs, 0);
+		std::cout << "Check kids result: " << result << std::endl;
+	}
+
+	if (result != -5)
+	{
+		content = this->mMemblockDevice.readBlock(result).toString();
+	}
+
+	return content;
+}
+
 
 int FileSystem::MakeDirectory(std::string dirPath)
 {

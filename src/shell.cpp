@@ -55,13 +55,17 @@ int main(void) {
                 break;
             case 3: // create
 				std::cout << "Create file" << std::endl;
-				if (fileSystem->CreateFile(commandArr[1]) == -5)
+				/*512 a-> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
+
+				if (fileSystem->CreateFile(commandArr[1], commandArr[2]) == -5)
 				{
-					std::cout << "ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
+					std::cout << "create: file " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
 				}
 				ClearCommandArr(commandArr);
                 break;
             case 4: // cat
+				std::cout << "CAT called" << std::endl;
+				std::cout << fileSystem->GetFileContent(commandArr[1]) << std::endl;
                 break;
             case 5: // createImagecd
                 break;
