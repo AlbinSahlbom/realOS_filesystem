@@ -25,46 +25,24 @@ private:
 	node * currentDirectory;
 
     void CreateNewNode(std::string dirName, node* parent, int blockNr);
+	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);
 
-	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index);//cd
-	int CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> dirs, unsigned int index);//returns the blocknumber of a file
+	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> &dirs, unsigned int index);//cd
+	int CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> &dirs, unsigned int index);//returns the blocknumber of a file
+
+	int GetDirectory(node *&currentNode, std::vector<std::string> &dirs, unsigned int index);
+	
 public:
     FileSystem(int nbrOfBlocks);
     ~FileSystem();
 
-    /* These commands needs to implemented
-     *
-     * However, you are free to change the parameterlist and specify your own returntype for each function below.
-     */
-
-    /* This function creates a file in the filesystem */
-	int CheckKidsMakeFile(node *currentNode, std::vector<std::string> dirs, unsigned int index, int blockNr);
-    int CreateFile(std::string filePath, std::string fileContent);
-	std::string GetFileContent(std::string filePath);
-    
-    /* Creates a folder in the filesystem */
-    int MakeDirectory(std::string dirPath);
-
-	/* Copy file to a selected folder*/
-
-    /* Removes a file in the filesystem */
-    // removeFile(...);
-
-    /* Removes a folder in the filesystem */
-    int RemoveFolder(std::string dirPath, std::string currentDir);
-
-    /* Function will move the current location to a specified location in the filesystem */
-    int GoToDirectory(std::string dirPath);//cd
-
-    /* This function will get all the files and folders in the specified folder */
-    int ListDir(std::string dirPath);
-
-
-
-    /* Add your own member-functions if needed */
-    int CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
-	int CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);
-	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);
+    int mkdir(std::string dirPath);
+	int create(std::string filePath, std::string fileContent);
+	int cat(std::string filePath, std::string &fileContent);
+	int cd(std::string dirPath);
+	int ls(std::string dirPath, std::string &dirContent);
+	
+	
 };
 
 #endif // FILESYSTEM_H

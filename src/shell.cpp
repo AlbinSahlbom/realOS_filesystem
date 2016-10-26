@@ -27,6 +27,9 @@ int main(void) {
 
     bool bRun = true;
 
+	std::string fileContents;//used for setting and getting fileContents(create, cat)
+	std::string dirContents;//used for ls
+
     do {
         std::cout << user << ":" << currentDir << "$ "<< std::endl;
         
@@ -46,26 +49,34 @@ int main(void) {
                 // Call fileSystem.format()
                 break;
             case 2: // ls
-                std::cout << "Listing directory" << std::endl;
-				if (fileSystem->ListDir(commandArr[1]) == -5)
+                std::cout << "LS called" << std::endl;
+				if (fileSystem->ls(commandArr[1], dirContents) == -1)
 				{
-					std::cout << "ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
+					std::cout << "ERROR ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
 				}
+				std::cout << dirContents << std::endl;
 				ClearCommandArr(commandArr);
                 break;
             case 3: // create
-				std::cout << "Create file" << std::endl;
+				std::cout << "ENTER FILE CONTENTS(max 512 chars):" << std::endl;
 				/*512 a-> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
-
-				if (fileSystem->CreateFile(commandArr[1], commandArr[2]) == -5)
+				
+				getline(std::cin, fileContents);
+				for (int i = fileContents.size(); i < 512; i++)
 				{
-					std::cout << "create: file " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
+					fileContents += " ";
+				}
+
+				if (fileSystem->create(commandArr[1], fileContents) == -1)
+				{
+					std::cout << "ERROR create: file with command" << commandArr[1] << std::endl;
 				}
 				ClearCommandArr(commandArr);
                 break;
             case 4: // cat
 				std::cout << "CAT called" << std::endl;
-				std::cout << fileSystem->GetFileContent(commandArr[1]) << std::endl;
+				fileSystem->cat(commandArr[1], fileContents);
+				std::cout << fileContents << std::endl;
                 break;
             case 5: // createImagecd
                 break;
@@ -80,16 +91,16 @@ int main(void) {
             case 10: // mv
                 break;
             case 11: // mkdir	//Klar
-                std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
-                if(fileSystem->MakeDirectory(commandArr[1]) == -5)
+                std::cout << "MKDIR called" << std::endl;
+                if(fileSystem->mkdir(commandArr[1]) == -1)
                 {
-                    std::cout << "mkdir: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
+                    std::cout << "ERROR mkdir: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
                 }
 				ClearCommandArr(commandArr);
                 break;
             case 12: // cd
-				std::cout << "Command: " << commandArr[0] << " with " << commandArr[1] << std::endl;
-				if (fileSystem->GoToDirectory(commandArr[1]) == -5)
+				std::cout << "CD CALLED" << std::endl;
+				if (fileSystem->cd(commandArr[1]) == -1)
 				{
 					std::cout << "cd: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
 				}
