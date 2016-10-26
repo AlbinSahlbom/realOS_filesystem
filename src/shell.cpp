@@ -42,7 +42,7 @@ int main(void) {
                 std::cout << "Exiting\n" << std::endl;
                 break;
             case 1: // format				//Klar
-				fileSystem->Format();
+				fileSystem->Format(currentDir);
                 break;
             case 2: // ls					//Klar
                 std::cout << "Listing directory" << std::endl;
@@ -57,8 +57,10 @@ int main(void) {
             case 4: // cat					//Klar
                 break;
             case 5: // createImagecd		//Fixa
+				fileSystem->CreateImageCd(commandArr[1]);
                 break;
-            case 6: // restoreImage			//Fixa
+            case 6: // restoreImagecd		//Fixa
+				fileSystem->RestoreImageCd(commandArr[1]);
                 break;
             case 7: // rmFile				//Klar
 				fileSystem->rmFile(commandArr[1]);

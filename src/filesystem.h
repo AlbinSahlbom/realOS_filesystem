@@ -36,8 +36,14 @@ public:
      * However, you are free to change the parameterlist and specify your own returntype for each function below.
      */
 
+	/* Saves the filesystem to an image on the disk */
+	int CreateImageCd(std::string fileName);
+
+	/* Restore a filesystem from an image on the disk */
+	int RestoreImageCd(std::string fileName);
+
 	/* Build an empty filesystem*/
-	int Format();
+	int Format(std::string &currentDir);
 
     /* This function creates a file in the filesystem */
     int CreateFile(std::string filePath, std::string currentDir);
@@ -71,7 +77,6 @@ private:
 
 	int DeleteNode(node *nodeToBeDeleted);
 	int DeleteFileBlock(int fileBlockToDelete);
-	int DeleteDir(node *currentNode, int kidNbr);
 	int RemoveFolder(node *currentNode, int kidNbr);
 	int RemoveFile(node *currentNode, int kidNbr, int fileBlock);
 };

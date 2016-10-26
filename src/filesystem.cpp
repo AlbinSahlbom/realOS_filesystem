@@ -1,7 +1,6 @@
 #include "filesystem.h"
 
 FileSystem::FileSystem(int nbrOfBlocks) {
-	FormatSystem();
 	this->root.parent = nullptr;
 	this->root.kids = nullptr;
 	this->root.blockNr = -5;
@@ -46,7 +45,7 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 	newNode->nbrOfKids = 0;
 	newNode->blockNr = -5;
 
-	if (parent->nbrOfKids == 1)
+	if (parent->nbrOfKids == 0)
 	{
 		parent->kids = new node*[1];
 		parent->kids[0] = newNode;
@@ -72,8 +71,26 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 }
 
 
-int FileSystem::Format()
+int FileSystem::CreateImageCd(std::string fileName)
 {
+	int result = -1;
+
+
+	return result;
+}
+
+int FileSystem::RestoreImageCd(std::string fileName)
+{
+	int result = -1;
+
+
+	return result;
+}
+
+int FileSystem::Format(std::string &currentDir)
+{
+	currentDirectory = &this->root;
+	currentDir = this->root.directoryName;
 	int result = -5;
 	for (int i = 0; i < 250; i++)
 	{
@@ -131,7 +148,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 {
 	int result = -5;
 
-	if (dirs.size() -1 == index && currentNode->nbrOfKids == 1)
+	if (dirs.size() -1 == index && currentNode->nbrOfKids == 0)
 	{
 		//skapa mapp
 		std::cout << "skapa mapp 1" << std::endl;
@@ -147,7 +164,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 		{
 			if (dirs.size() - 1 > index)
 			{
-				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 1)
+				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
 				{
 					index = index +1;
 					std::cout << "Dirs size index: " << dirs.size() << " Index: " << index << std::endl;
@@ -159,7 +176,7 @@ int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dir
 			else //in last folder
 			{
 				//om mappen redan finns
-				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 1)
+				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
 				{
 					std::cout << "Kid found" << std::endl;
 					k = currentNode->nbrOfKids;//exit loop
@@ -183,7 +200,7 @@ int FileSystem::CheckKidsListDir(node *currentNode, std::vector<std::string> dir
 
 	for (int  i = 0; i < currentNode->nbrOfKids; i++)
 	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
 		{
 			for (int k = 0; i < currentNode->kids[i]->nbrOfKids; i++)
 			{
@@ -192,7 +209,7 @@ int FileSystem::CheckKidsListDir(node *currentNode, std::vector<std::string> dir
 			i = currentNode->nbrOfKids;
 			result = 1;
 		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
 		{
 			result = CheckKidsListDir(currentNode->kids[i], dirs, index++);
 		}
@@ -305,19 +322,28 @@ int FileSystem::RemoveFile(node *currentNode, int kidNbr, int fileBlock)
 {
 	int result = -5;
 	result = DeleteFileBlock(currentNode->blockNr);
-	currentNode->parent->nbrOfKids--;
 	delete currentNode->kids[kidNbr];
+	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
+	{
+		currentNode->kids[i] = currentNode->kids[i + 1];
+	}
+	currentNode->kids[currentNode->nbrOfKids - 1] = nullptr;
+	currentNode->nbrOfKids--;
 	return result;
 }
 
 int FileSystem::RemoveFolder(node *currentNode, int kidNbr)
 {
-	int result = -5;
-
-	result = DeleteNode(currentNode);
-
-	delete currentNode;
-
+	int result = 1;
+	delete currentNode->kids[kidNbr];
+	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
+	{
+		node *temp = currentNode->kids[i];
+		node *temp2 = currentNode->kids[i + 1];
+		currentNode->kids[i] = currentNode->kids[i + 1];
+	}
+	currentNode->kids[currentNode->nbrOfKids - 1] = nullptr;
+	currentNode->nbrOfKids--;
 	return result;
 }
 
@@ -326,7 +352,7 @@ int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> 
 	int result = -5;
 	for (int i = 0; i < currentNode->nbrOfKids; i++)
 	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)//last folder in searchpath
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//last folder in searchpath
 		{
 			//dir exists, set current directory to point at the dir found
 			this->currentDirectory = currentNode->kids[i];
@@ -336,7 +362,7 @@ int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> 
 			i = currentNode->nbrOfKids;//exit loop
 			result = 1;
 		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 1)//search for kids, if found use function recursively
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//search for kids, if found use function recursively
 		{
 			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
 		}
@@ -406,14 +432,5 @@ int FileSystem::DeleteFileBlock(int fileBlockToDelete)
 {
 	int result = -5;
 	result = mMemblockDevice.DeleteBlock(fileBlockToDelete);
-	return result;
-}
-
-int FileSystem::DeleteDir(node * currentNode, int kidNbr)
-{
-	int result = 1;
-	currentNode->parent->nbrOfKids--;
-	delete currentNode->kids[kidNbr];
-
 	return result;
 }
