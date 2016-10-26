@@ -70,8 +70,297 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent, int blockNr)
 	return;
 }
 
+std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
+{
+	std::vector<std::string> dirs;
+	std::string temp = "";
+	int asd = dirPath.length();
+	for (unsigned int i = 0; i <= dirPath.length(); i++)
+	{
 
-<<<<<<< HEAD
+		if (dirPath[i] == '/')
+		{
+			dirs.push_back(temp);
+			temp = "";
+		}
+		else if (i == dirPath.length() && dirPath[i] != '/')
+		{
+			dirs.push_back(temp);
+			temp = "";
+		}
+		else
+		{
+			temp += dirPath[i];
+		}
+	}
+	return dirs;
+}
+
+int FileSystem::GetDirectory(node *&currentNode, std::vector<std::string> &dirs, unsigned int index)
+{
+	int res = -1;
+
+	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)//currentNode is last forlder, no kids found -> result == 1
+	{
+		res = 1;
+	}
+	else
+	{
+		for (unsigned int i = 0; i < currentNode->nbrOfKids; i++)//for each kid in current node
+		{
+			if (dirs.size() - 1 > index)
+			{
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//if directory in path, and is actually an directory and not a file
+				{
+					index++;
+					currentNode = currentNode->kids[i];
+					this->GetDirectory(currentNode, dirs, index);
+					res = 1;
+					i = currentNode->nbrOfKids;
+
+				}
+			}
+			else//in last folder
+			{
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//if in last folder, make sure requested name don't exist
+				{
+					res = -1;
+					i = currentNode->nbrOfKids;
+				}
+				else
+				{
+					res = 1;
+				}
+			}
+		}
+	}
+	return res;
+}
+
+int FileSystem::mkdir(std::string dirPath)
+{
+	int res = -1;
+	std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
+	node* currentNode;
+
+	if (dirPath[0] == '/')
+	{
+		currentNode = &root;
+		res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
+	}
+	else
+	{
+		currentNode = currentDirectory;
+		res = this->GetDirectory(currentNode, dirs, 0);
+	}
+
+	if (res == 1)
+	{
+		CreateNewNode(dirs[dirs.size() - 1], currentNode, -5);
+	}
+
+	return res;
+}
+
+int FileSystem::create(std::string filePath, std::string fileContent)
+{
+	int res = -1;
+	int blockNr = this->TakeFirstFreeBlockNbr();
+	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
+	node* currentNode;
+
+	if (filePath[0] == '/')
+	{
+		currentNode = &root;
+		res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
+	}
+	else
+	{
+		currentNode = currentDirectory;
+		res = this->GetDirectory(currentNode, dirs, 0);
+	}
+
+	if (res == 1)
+	{
+		CreateNewNode(dirs[dirs.size() - 1], currentNode, blockNr);
+		this->mMemblockDevice.writeBlock(blockNr, fileContent);
+	}
+
+
+	return res;
+}
+
+int FileSystem::CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> &dirs, unsigned int index)
+{
+	int blockNr = -1;
+
+	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)
+	{
+		blockNr = -1;
+	}
+	else
+	{
+		for (unsigned int i = 0; i < currentNode->nbrOfKids; i++)
+		{
+			if (dirs.size() - 1 > index)
+			{
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)
+				{
+					index++;
+					blockNr = CheckKidsFindBlockNr(currentNode->kids[i], dirs, index);
+					i = currentNode->nbrOfKids;//exit loop
+				}
+			}
+			else //in last folder
+			{
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr > -1)
+				{
+					blockNr = currentNode->kids[i]->blockNr;
+					i = currentNode->nbrOfKids;//exit loop
+				}
+				else
+				{
+					blockNr = -1;
+				}
+			}
+		}
+	}
+
+	return blockNr;
+}
+
+int FileSystem::cat(std::string filePath, std::string &fileContent)
+{
+	int blockNr = -1;
+
+	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
+	node* currentNode;
+
+	if (filePath[0] == '/')
+	{
+		blockNr = this->CheckKidsFindBlockNr(&this->root, dirs, 1);
+	}
+	else
+	{
+		blockNr = this->CheckKidsFindBlockNr(this->currentDirectory, dirs, 0);
+	}
+
+	if (blockNr != -1)
+	{
+		fileContent = this->mMemblockDevice.readBlock(blockNr).toString();
+
+		return 1;
+	}
+	else
+	{
+		fileContent = "File not found";
+
+		return -1;
+	}
+}
+
+int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> &dirs, unsigned int index)//moves the "currentDir" pointer to requested destination
+{
+	int result = -1;
+	for (int i = 0; i < currentNode->nbrOfKids; i++)
+	{
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//last folder in searchpath
+		{
+			//dir exists, set current directory to point at the dir found
+			this->currentDirectory = currentNode->kids[i];
+			i = currentNode->nbrOfKids;//exit loop
+			result = 1;
+		}
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//search for kids, if found use function recursively
+		{
+			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
+		}
+	}
+	return result;
+}
+
+int FileSystem::cd(std::string dirPath)
+{
+	int res = -1;
+	std::vector<std::string> dirs;
+
+	dirs = ConvertDirPathToVector(dirPath);
+
+	if (dirPath[0] == '/')//absolute path
+	{
+		if (dirPath.length() == 1)//just go to root
+		{
+			this->currentDirectory = &this->root;
+			res = 1;
+		}
+		else//else reccusion
+		{
+			res = SetCurrentDirByPath(&root, dirs, 1);
+		}
+	}
+	else
+	{
+		res = SetCurrentDirByPath(this->currentDirectory, dirs, 0);
+	}
+	return res;
+}
+
+int FileSystem::ls(std::string dirPath, std::string &dirContents)
+{
+	int res = -1;
+	dirContents = "";
+
+	int stopper = 0;
+
+	if (dirPath == "")//currrent dir
+	{
+		if (this->currentDirectory->nbrOfKids == 0)
+		{
+			dirContents = "Current directory is empty";
+		}
+		else
+		{
+			for (int i = 0; i < this->currentDirectory->nbrOfKids; i++)
+			{
+				dirContents += this->currentDirectory->kids[i]->directoryName + " ";
+			}
+		}
+		res = 1;
+	}
+	else
+	{
+		std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
+		node* currentNode;
+
+		if (dirPath[0] == '/')
+		{
+			currentNode = &root;
+			res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
+		}
+		else
+		{
+			currentNode = currentDirectory;
+			res = this->GetDirectory(currentNode, dirs, 0);
+		}
+
+		if (res == 1)
+		{
+			if (currentNode->nbrOfKids == 0)
+			{
+				dirContents = "Current directory is empty";
+			}
+			else
+			{
+				for (int i = 0; i < currentNode->nbrOfKids; i++)
+				{
+					dirContents += currentNode->kids[i]->directoryName + " ";
+				}
+			}
+		}
+	}
+	return res;
+}
+
 int FileSystem::CreateImageCd(std::string fileName)
 {
 	int result = -1;
@@ -108,307 +397,27 @@ int FileSystem::Format(std::string &currentDir)
 	return result;
 }
 
-int FileSystem::ListDir(std::string dirPath, std::string currentDir)
-=======
-std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
+int FileSystem::DeleteNode(node *nodeToBeDeleted)
 {
-	std::vector<std::string> dirs;
-	std::string temp = "";
-	int asd = dirPath.length();
-	for (unsigned int i = 0; i <= dirPath.length(); i++)
-	{
-<<<<<<< HEAD
-		for (int i = 0; i < currentDirectory->nbrOfKids; i++)
-		{
-			std::cout << currentDirectory->kids[i]->directoryName << std::endl;
-			result = 1;
-=======
 
-		if (dirPath[i] == '/')
+	int result = -5;
+	for (int i = 0; i < nodeToBeDeleted->nbrOfKids; i++)
+	{
+		if (nodeToBeDeleted->kids[i]->blockNr != -5)
 		{
-			dirs.push_back(temp);
-			temp = "";
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
+			result = RemoveFile(nodeToBeDeleted, i, nodeToBeDeleted->kids[i]->blockNr);
+			i--;
 		}
-		else if (i == dirPath.length() && dirPath[i] != '/')
+		else if (nodeToBeDeleted->kids[i]->nbrOfKids == 0)
 		{
-			dirs.push_back(temp);
-			temp = "";
+			result = RemoveFolder(nodeToBeDeleted, i);
+			i--;
 		}
 		else
 		{
-			temp += dirPath[i];
+			result = DeleteNode(nodeToBeDeleted->kids[i]);
+			i--;
 		}
-	}
-	return dirs;
-}
-
-int FileSystem::GetDirectory(node *&currentNode, std::vector<std::string> &dirs, unsigned int index)
-{
-	int res = -1;
-
-	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)//currentNode is last forlder, no kids found -> result == 1
-	{
-		res = 1;
-	}
-	else
-	{
-		for (unsigned int i = 0; i < currentNode->nbrOfKids; i++)//for each kid in current node
-		{
-			if (dirs.size() - 1 > index) 
-			{
-<<<<<<< HEAD
-				std::cout << root.kids[i]->directoryName << std::endl;
-				result = 1;
-			}
-		}
-		else
-		{
-			result = CheckKidsListDir(currentDirectory, dirs, 0);
-=======
-				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//if directory in path, and is actually an directory and not a file
-				{
-					index++;
-					currentNode = currentNode->kids[i];
-					this->GetDirectory(currentNode, dirs, index);
-					res = 1;
-					i = currentNode->nbrOfKids;
-					
-				}
-			}
-			else//in last folder
-			{
-				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//if in last folder, make sure requested name don't exist
-				{
-					res = -1;
-					i = currentNode->nbrOfKids;
-				}
-				else
-				{
-					res = 1;
-				}
-			}
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
-		}
-	}
-
-	return res;
-}
-int FileSystem::mkdir(std::string dirPath)
-{
-	int res = -1;
-	std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
-	node* currentNode;
-
-	if (dirPath[0] == '/')
-	{
-		currentNode = &root;
-		res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
-	}
-	else
-	{
-		currentNode = currentDirectory;
-		res = this->GetDirectory(currentNode, dirs, 0);
-	}
-
-	if (res == 1)
-	{
-		CreateNewNode(dirs[dirs.size() -1], currentNode, -5);
-	}
-
-	return res;
-}
-int FileSystem::create(std::string filePath, std::string fileContent)
-{
-	int res = -1;
-	int blockNr = this->TakeFirstFreeBlockNbr();
-	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
-	node* currentNode;
-
-	if (filePath[0] == '/')
-	{
-		currentNode = &root;
-		res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
-	}
-	else
-	{
-		currentNode = currentDirectory;
-		res = this->GetDirectory(currentNode, dirs, 0);
-	}
-
-	if (res == 1)
-	{
-		CreateNewNode(dirs[dirs.size() - 1], currentNode, blockNr);
-		this->mMemblockDevice.writeBlock(blockNr, fileContent);
-	}
-	
-
-	return res;
-}
-
-int FileSystem::CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> &dirs, unsigned int index)
-{
-	int blockNr = -1;
-
-<<<<<<< HEAD
-		result = 1;
-=======
-	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)
-	{
-		blockNr = -1;
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
-	}
-	else
-	{
-		for (unsigned int k = 0; k < currentNode->nbrOfKids; k++)
-		{
-			if (dirs.size() - 1 > index)
-			{
-				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
-				{
-					index++;
-					blockNr = CheckKidsFindBlockNr(currentNode->kids[k], dirs, index);
-					k = currentNode->nbrOfKids;//exit loop
-				}
-			}
-			else //in last folder
-			{
-				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
-				{
-					blockNr = currentNode->kids[k]->blockNr;
-					k = currentNode->nbrOfKids;//exit loop
-				}
-				else
-				{
-					blockNr = -1;
-				}
-			}
-		}
-<<<<<<< HEAD
-		if (!madeDir)
-		{
-			std::cout << "Skapa mapp 2" << std::endl;
-			CreateNewNode(dirs[index],currentNode);
-			result = 1;
-		}
-=======
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
-	}
-
-	return blockNr;
-}
-int FileSystem::cat(std::string filePath, std::string &fileContent)
-{
-	int blockNr = -1;
-
-	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
-	node* currentNode;
-
-	if (filePath[0] == '/')
-	{
-		blockNr = this->CheckKidsFindBlockNr(&this->root, dirs, 1);
-	}
-	else
-	{
-		blockNr = this->CheckKidsFindBlockNr(this->currentDirectory, dirs, 0);
-	}
-
-	if (blockNr != -1)
-	{
-		fileContent = this->mMemblockDevice.readBlock(blockNr).toString();
-		
-		return 1;
-	}
-	else
-	{
-		fileContent = "File not found";
-
-		return -1;
-	}
-}
-
-int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> &dirs, unsigned int index)//moves the "currentDir" pointer to requested destination
-{
-	int result = -1;
-	for (int i = 0; i < currentNode->nbrOfKids; i++)
-	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//last folder in searchpath
-		{
-<<<<<<< HEAD
-			for (int k = 0; i < currentNode->kids[i]->nbrOfKids; i++)
-			{
-				std::cout << currentNode->kids[i]->kids[k]->directoryName << std::endl;
-			}
-			i = currentNode->nbrOfKids;
-=======
-			//dir exists, set current directory to point at the dir found
-			this->currentDirectory = currentNode->kids[i];
-			i = currentNode->nbrOfKids;//exit loop
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
-			result = 1;
-		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//search for kids, if found use function recursively
-		{
-			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
-		}
-	}
-	return result;
-}
-int FileSystem::cd(std::string dirPath)
-{
-	int res = -1;
-	std::vector<std::string> dirs;
-	
-	dirs = ConvertDirPathToVector(dirPath);
-
-	if (dirPath[0] == '/')//absolute path
-	{
-		if (dirPath.length() == 1)//just go to root
-		{
-			this->currentDirectory = &this->root;
-			res = 1;
-		}
-		else//else reccusion
-		{
-			res = SetCurrentDirByPath(&root, dirs, 1);
-		}
-	}
-	else
-	{
-		res = SetCurrentDirByPath(this->currentDirectory, dirs, 0);
-	}
-
-	return res;
-
-
-}
-
-int FileSystem::ls(std::string dirPath, std::string &dirContents)
-{
-	int res = -1;
-	dirContents = "";
-
-	if (dirPath == "")//currrent dir
-	{
-		if (this->currentDirectory->nbrOfKids == 0)
-		{
-			dirContents = "Current directory is empty";
-		}
-		else
-		{
-			for (int i = 0; i < this->currentDirectory->nbrOfKids; i++)
-			{
-				dirContents += this->currentDirectory->kids[i]->directoryName + " ";
-			}
-		}
-		res = 1;
-	}
-	else
-	{
-<<<<<<< HEAD
-		result = CheckKidsMakeDir(this->currentDirectory, dirs, 0);
-		std::cout << "Check kids result: " <<  result << std::endl;
 	}
 	return result;
 }
@@ -471,123 +480,9 @@ int FileSystem::RemoveFolder(node *currentNode, int kidNbr)
 	return result;
 }
 
-int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index)//moves the "currentDir" pointer to requested destination
-{
-	int result = -5;
-	for (int i = 0; i < currentNode->nbrOfKids; i++)
-	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//last folder in searchpath
-		{
-			//dir exists, set current directory to point at the dir found
-			this->currentDirectory = currentNode->kids[i];
-
-
-
-			i = currentNode->nbrOfKids;//exit loop
-			result = 1;
-		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//search for kids, if found use function recursively
-		{
-			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
-		}
-	}
-	return result;
-}
-
-int FileSystem::GoToDirectory(std::string dirPath, std::string &currentWorkDir)	//cd
-{
-	std::vector<std::string> dirs;
-
-	std::cout << "CD called" << std::endl;
-	int result = -5;
-
-	dirs = ConvertDirPathToVector(dirPath);
-
-
-	if (dirPath[0] == '/')
-	{
-		//Absolut path
-		result = SetCurrentDirByPath(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
-		if (result == 1)
-		{
-			currentWorkDir = "/" + dirPath + "/";
-		}
-		std::cout << "Absolute path: " << result << std::endl;
-	}
-	else
-	{
-		result = SetCurrentDirByPath(this->currentDirectory, dirs, 0);
-		if (result == 1)
-		{
-			currentWorkDir += dirPath + "/";
-		}
-		std::cout << "Path: " << result << std::endl;
-	}
-
-	return result;
-}
-
-int FileSystem::DeleteNode(node *nodeToBeDeleted)
-{
-
-	int result = -5;
-	for (int i = 0; i < nodeToBeDeleted->nbrOfKids; i++)
-	{
-		if (nodeToBeDeleted->kids[i]->blockNr != -5)
-		{
-			result = RemoveFile(nodeToBeDeleted, i, nodeToBeDeleted->kids[i]->blockNr);
-			i--;
-		}
-		else if (nodeToBeDeleted->kids[i]->nbrOfKids == 0)
-		{
-			result = RemoveFolder(nodeToBeDeleted, i);
-			i--;
-		}
-		else
-		{
-			result = DeleteNode(nodeToBeDeleted->kids[i]);
-			i--;
-		}
-	}
-	return result;
-}
-
 int FileSystem::DeleteFileBlock(int fileBlockToDelete)
 {
 	int result = -5;
 	result = mMemblockDevice.DeleteBlock(fileBlockToDelete);
 	return result;
-=======
-		std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
-		node* currentNode;
-
-		if (dirPath[0] == '/')
-		{
-			currentNode = &root;
-			res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
-		}
-		else
-		{
-			currentNode = currentDirectory;
-			res = this->GetDirectory(currentNode, dirs, 0);
-		}
-
-		if (res == 1)
-		{
-			if (currentNode->nbrOfKids == 0)
-			{
-				dirContents = "Current directory is empty";
-			}
-			else
-			{
-				for (int i = 0; i < currentNode->nbrOfKids; i++)
-				{
-					dirContents += currentNode->kids[i]->directoryName + " ";
-				}
-			}
-		}
-	}
-
-	return res;
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
 }

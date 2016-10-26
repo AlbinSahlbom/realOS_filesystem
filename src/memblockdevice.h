@@ -5,7 +5,7 @@
 class MemBlockDevice: public BlockDevice
 {
 private:
-    
+    int* allBlockNbrs;
 public:
     MemBlockDevice(int nrOfBlocks = 250);
     MemBlockDevice(const MemBlockDevice &other);
@@ -19,6 +19,7 @@ public:
     /* Returns amount of free blocks */
     int spaceLeft() const;
 
+    int TakeFirstFreeBlockNbr();
 
     /* Writes a block */
     int writeBlock(int blockNr, const std::vector<char> &vec);

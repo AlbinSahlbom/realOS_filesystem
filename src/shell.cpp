@@ -27,8 +27,8 @@ int main(void) {
 
     bool bRun = true;
 
-	std::string fileContents;//used for setting and getting fileContents(create, cat)
-	std::string dirContents;//used for ls
+	std::string fileContents = "";//used for setting and getting fileContents(create, cat)
+	std::string dirContents = "";//used for ls
 
     do {
         std::cout << user << ":" << currentDir << "$ "<< std::endl;
@@ -47,19 +47,19 @@ int main(void) {
             case 1: // format				//Klar
 				fileSystem->Format(currentDir);
                 break;
-            case 2: // ls
-                std::cout << "LS called" << std::endl;
+            case 2: // ls					//Klar
+				std::cout << "LS called" << std::endl;
 				if (fileSystem->ls(commandArr[1], dirContents) == -1)
 				{
-					std::cout << "ERROR ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
+					std::cout << "ERROR ls: directory " << commandArr[1] << " not found or there are no files/directories in the map" << std::endl;
 				}
 				std::cout << dirContents << std::endl;
 				ClearCommandArr(commandArr);
-                break;
-            case 3: // create
+				break;
+            case 3: // create				//Klar
 				std::cout << "ENTER FILE CONTENTS(max 512 chars):" << std::endl;
 				/*512 a-> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
-				
+
 				getline(std::cin, fileContents);
 				for (int i = fileContents.size(); i < 512; i++)
 				{
@@ -71,12 +71,13 @@ int main(void) {
 					std::cout << "ERROR create: file with command" << commandArr[1] << std::endl;
 				}
 				ClearCommandArr(commandArr);
-                break;
-            case 4: // cat
+				break;
+            case 4: // cat					//Klar
 				std::cout << "CAT called" << std::endl;
 				fileSystem->cat(commandArr[1], fileContents);
 				std::cout << fileContents << std::endl;
-                break;
+				ClearCommandArr(commandArr);
+				break;
             case 5: // createImagecd		//Fixa
 				fileSystem->CreateImageCd(commandArr[1]);
                 break;
@@ -96,7 +97,6 @@ int main(void) {
             case 11: // mv					//Behover inte ha med
                 break;
             case 12: // mkdir				//Klar
-			{
 				std::cout << "MKDIR called" << std::endl;
 				if (fileSystem->mkdir(commandArr[1]) == -1)
 				{
@@ -104,9 +104,7 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
 				break;
-			}
             case 13: // cd					//Klar
-			{
 				std::cout << "CD CALLED" << std::endl;
 				if (fileSystem->cd(commandArr[1]) == -1)
 				{
@@ -114,7 +112,6 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
 				break;
-			}
             case 14: // pwd					//Klar
 				std::cout << currentDir << std::endl;
 				ClearCommandArr(commandArr);

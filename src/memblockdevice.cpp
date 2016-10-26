@@ -2,7 +2,11 @@
 #include <stdexcept>
 
 MemBlockDevice::MemBlockDevice(int nrOfBlocks): BlockDevice(nrOfBlocks) {
-    
+    this->allBlockNbrs = new int[nrOfBlocks];
+    for(int i = 0; i < nrOfBlocks; i++)
+    {
+        this->allBlockNbrs[i] = i;
+    }
 }
 
 MemBlockDevice::MemBlockDevice(const MemBlockDevice &other) : BlockDevice(other) {
@@ -11,7 +15,7 @@ MemBlockDevice::MemBlockDevice(const MemBlockDevice &other) : BlockDevice(other)
 
 MemBlockDevice::~MemBlockDevice() {
     /* Implicit call to base-class destructor */
-    
+    delete [] this->allBlockNbrs;
 }
 
 MemBlockDevice& MemBlockDevice::operator=(const MemBlockDevice &other) {
@@ -42,6 +46,7 @@ int MemBlockDevice::spaceLeft() const {
 
 int MemBlockDevice::writeBlock(int blockNr, const std::vector<char> &vec) {
     int output = -1;    // Assume blockNr out-of-range
+    blockNr = this->TakeFirstFreeBlockNbr();
 
     if (blockNr < this->nrOfBlocks && blockNr >= 0) {
         /* -2 = vec and block dont have same dimensions */
@@ -100,7 +105,6 @@ int MemBlockDevice::size() const {
     return this->nrOfBlocks;
 }
 
-<<<<<<< HEAD
 int MemBlockDevice::DeleteBlock(int blockToDelete)
 {
 	delete &this->memBlocks[blockToDelete];
@@ -121,5 +125,3 @@ int MemBlockDevice::TakeFirstFreeBlockNbr()
     }
     return firstFreeBlock;
 }
-=======
->>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
