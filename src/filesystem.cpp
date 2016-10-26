@@ -36,14 +36,14 @@ int FileSystem::TakeFirstFreeBlockNbr()
 	return firstFreeBlock;
 }
 
-void FileSystem::CreateNewNode(std::string dirName, node* parent)
+void FileSystem::CreateNewNode(std::string dirName, node* parent, int blockNr)
 {
 	node *newNode = new node;
 	newNode->directoryName = dirName;
 	newNode->parent = parent;
 	newNode->kids = nullptr;
 	newNode->nbrOfKids = 0;
-	newNode->blockNr = -5;
+	newNode->blockNr = blockNr;
 
 	if (parent->nbrOfKids == 0)
 	{
@@ -71,6 +71,7 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent)
 }
 
 
+<<<<<<< HEAD
 int FileSystem::CreateImageCd(std::string fileName)
 {
 	int result = -1;
@@ -108,127 +109,27 @@ int FileSystem::Format(std::string &currentDir)
 }
 
 int FileSystem::ListDir(std::string dirPath, std::string currentDir)
-{
-	int result = -5;
-
-	if (dirPath == "")
-	{
-		for (int i = 0; i < currentDirectory->nbrOfKids; i++)
-		{
-			std::cout << currentDirectory->kids[i]->directoryName << std::endl;
-			result = 1;
-		}
-	}
-	else
-	{
-		std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
-
-		if (dirPath[0] == '/')
-		{
-			//Absolut path
-			result = CheckKidsListDir(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
-		}
-		else if (dirs[0] == "")
-		{
-			for (int i = 0; i < root.nbrOfKids; i++)
-			{
-				std::cout << root.kids[i]->directoryName << std::endl;
-				result = 1;
-			}
-		}
-		else
-		{
-			result = CheckKidsListDir(currentDirectory, dirs, 0);
-		}
-	}
-	return result;
-}
-
-int FileSystem::CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index)
-{
-	int result = -5;
-
-	if (dirs.size() -1 == index && currentNode->nbrOfKids == 0)
-	{
-		//skapa mapp
-		std::cout << "skapa mapp 1" << std::endl;
-		//Skapamappfunktion
-		CreateNewNode(dirs[index], currentNode);
-
-		result = 1;
-	}
-	else
-	{
-		bool madeDir = false;
-		for(unsigned int k = 0; k < currentNode->nbrOfKids; k++)
-		{
-			if (dirs.size() - 1 > index)
-			{
-				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
-				{
-					index = index +1;
-					std::cout << "Dirs size index: " << dirs.size() << " Index: " << index << std::endl;
-					result = CheckKidsMakeDir(currentNode->kids[k], dirs, index);
-					k = currentNode->nbrOfKids;//exit loop
-					madeDir = true;
-				}
-			}
-			else //in last folder
-			{
-				//om mappen redan finns
-				if(currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
-				{
-					std::cout << "Kid found" << std::endl;
-					k = currentNode->nbrOfKids;//exit loop
-					madeDir = true;
-				}
-			}
-		}
-		if (!madeDir)
-		{
-			std::cout << "Skapa mapp 2" << std::endl;
-			CreateNewNode(dirs[index],currentNode);
-			result = 1;
-		}
-	}
-	return result;
-}
-
-int FileSystem::CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index)
-{
-	int result = -5;
-
-	for (int  i = 0; i < currentNode->nbrOfKids; i++)
-	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
-		{
-			for (int k = 0; i < currentNode->kids[i]->nbrOfKids; i++)
-			{
-				std::cout << currentNode->kids[i]->kids[k]->directoryName << std::endl;
-			}
-			i = currentNode->nbrOfKids;
-			result = 1;
-		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)
-		{
-			result = CheckKidsListDir(currentNode->kids[i], dirs, index++);
-		}
-	}
-	return result;
-}
-
+=======
 std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
+>>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
 {
 	std::vector<std::string> dirs;
 	std::string temp = "";
 	int asd = dirPath.length();
 	for (unsigned int i = 0; i <= dirPath.length(); i++)
 	{
+<<<<<<< HEAD
+		for (int i = 0; i < currentDirectory->nbrOfKids; i++)
+		{
+			std::cout << currentDirectory->kids[i]->directoryName << std::endl;
+			result = 1;
+=======
 
 		if (dirPath[i] == '/')
 		{
 			dirs.push_back(temp);
 			temp = "";
+>>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
 		}
 		else if (i == dirPath.length() && dirPath[i] != '/')
 		{
@@ -243,46 +144,269 @@ std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
 	return dirs;
 }
 
-int FileSystem::CreateFile(std::string filePath, std::string currentDir)
+int FileSystem::GetDirectory(node *&currentNode, std::vector<std::string> &dirs, unsigned int index)
 {
-	int result = -5;
-	return result;
-}
+	int res = -1;
 
-int FileSystem::MakeDirectory(std::string dirPath, std::string currentDir)
-{
-	std::vector<std::string> dirs;
-	//std::string temp = "";
-	std::cout << "Dir path lenght: " << dirPath.length() << std::endl;
-	int result = -5;
-
-	dirs = ConvertDirPathToVector(dirPath);
-
-	//for (unsigned int i = 0; i <= dirPath.length(); i++)
-	//{
-	//	if(dirPath[i] == '/')
-	//	{
-	//		dirs.push_back(temp);
-	//		temp = "";
-	//	}
-	//	else if(i == dirPath.length() && dirPath[i] != '/')
-	//	{
-	//		dirs.push_back(temp);
-	//		temp = "";
-	//	}
-	//	else
-	//	{
-	//		temp += dirPath[i];
-	//	}
-	//}
-	if(dirPath[0] == '/')
+	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)//currentNode is last forlder, no kids found -> result == 1
 	{
-		//Absolut path
-		result = CheckKidsMakeDir(&root, dirs, 1);		//Sending 1 as index because 0 is "/"
-		std::cout << "Check kids result: " << result << std::endl;
+		res = 1;
 	}
 	else
 	{
+		for (unsigned int i = 0; i < currentNode->nbrOfKids; i++)//for each kid in current node
+		{
+			if (dirs.size() - 1 > index) 
+			{
+<<<<<<< HEAD
+				std::cout << root.kids[i]->directoryName << std::endl;
+				result = 1;
+			}
+		}
+		else
+		{
+			result = CheckKidsListDir(currentDirectory, dirs, 0);
+=======
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//if directory in path, and is actually an directory and not a file
+				{
+					index++;
+					currentNode = currentNode->kids[i];
+					this->GetDirectory(currentNode, dirs, index);
+					res = 1;
+					i = currentNode->nbrOfKids;
+					
+				}
+			}
+			else//in last folder
+			{
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0)//if in last folder, make sure requested name don't exist
+				{
+					res = -1;
+					i = currentNode->nbrOfKids;
+				}
+				else
+				{
+					res = 1;
+				}
+			}
+>>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
+		}
+	}
+
+	return res;
+}
+int FileSystem::mkdir(std::string dirPath)
+{
+	int res = -1;
+	std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
+	node* currentNode;
+
+	if (dirPath[0] == '/')
+	{
+		currentNode = &root;
+		res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
+	}
+	else
+	{
+		currentNode = currentDirectory;
+		res = this->GetDirectory(currentNode, dirs, 0);
+	}
+
+	if (res == 1)
+	{
+		CreateNewNode(dirs[dirs.size() -1], currentNode, -5);
+	}
+
+	return res;
+}
+int FileSystem::create(std::string filePath, std::string fileContent)
+{
+	int res = -1;
+	int blockNr = this->TakeFirstFreeBlockNbr();
+	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
+	node* currentNode;
+
+	if (filePath[0] == '/')
+	{
+		currentNode = &root;
+		res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
+	}
+	else
+	{
+		currentNode = currentDirectory;
+		res = this->GetDirectory(currentNode, dirs, 0);
+	}
+
+	if (res == 1)
+	{
+		CreateNewNode(dirs[dirs.size() - 1], currentNode, blockNr);
+		this->mMemblockDevice.writeBlock(blockNr, fileContent);
+	}
+	
+
+	return res;
+}
+
+int FileSystem::CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> &dirs, unsigned int index)
+{
+	int blockNr = -1;
+
+<<<<<<< HEAD
+		result = 1;
+=======
+	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)
+	{
+		blockNr = -1;
+>>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
+	}
+	else
+	{
+		for (unsigned int k = 0; k < currentNode->nbrOfKids; k++)
+		{
+			if (dirs.size() - 1 > index)
+			{
+				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				{
+					index++;
+					blockNr = CheckKidsFindBlockNr(currentNode->kids[k], dirs, index);
+					k = currentNode->nbrOfKids;//exit loop
+				}
+			}
+			else //in last folder
+			{
+				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				{
+					blockNr = currentNode->kids[k]->blockNr;
+					k = currentNode->nbrOfKids;//exit loop
+				}
+				else
+				{
+					blockNr = -1;
+				}
+			}
+		}
+<<<<<<< HEAD
+		if (!madeDir)
+		{
+			std::cout << "Skapa mapp 2" << std::endl;
+			CreateNewNode(dirs[index],currentNode);
+			result = 1;
+		}
+=======
+>>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
+	}
+
+	return blockNr;
+}
+int FileSystem::cat(std::string filePath, std::string &fileContent)
+{
+	int blockNr = -1;
+
+	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
+	node* currentNode;
+
+	if (filePath[0] == '/')
+	{
+		blockNr = this->CheckKidsFindBlockNr(&this->root, dirs, 1);
+	}
+	else
+	{
+		blockNr = this->CheckKidsFindBlockNr(this->currentDirectory, dirs, 0);
+	}
+
+	if (blockNr != -1)
+	{
+		fileContent = this->mMemblockDevice.readBlock(blockNr).toString();
+		
+		return 1;
+	}
+	else
+	{
+		fileContent = "File not found";
+
+		return -1;
+	}
+}
+
+int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> &dirs, unsigned int index)//moves the "currentDir" pointer to requested destination
+{
+	int result = -1;
+	for (int i = 0; i < currentNode->nbrOfKids; i++)
+	{
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//last folder in searchpath
+		{
+<<<<<<< HEAD
+			for (int k = 0; i < currentNode->kids[i]->nbrOfKids; i++)
+			{
+				std::cout << currentNode->kids[i]->kids[k]->directoryName << std::endl;
+			}
+			i = currentNode->nbrOfKids;
+=======
+			//dir exists, set current directory to point at the dir found
+			this->currentDirectory = currentNode->kids[i];
+			i = currentNode->nbrOfKids;//exit loop
+>>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
+			result = 1;
+		}
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//search for kids, if found use function recursively
+		{
+			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
+		}
+	}
+	return result;
+}
+int FileSystem::cd(std::string dirPath)
+{
+	int res = -1;
+	std::vector<std::string> dirs;
+	
+	dirs = ConvertDirPathToVector(dirPath);
+
+	if (dirPath[0] == '/')//absolute path
+	{
+		if (dirPath.length() == 1)//just go to root
+		{
+			this->currentDirectory = &this->root;
+			res = 1;
+		}
+		else//else reccusion
+		{
+			res = SetCurrentDirByPath(&root, dirs, 1);
+		}
+	}
+	else
+	{
+		res = SetCurrentDirByPath(this->currentDirectory, dirs, 0);
+	}
+
+	return res;
+
+
+}
+
+int FileSystem::ls(std::string dirPath, std::string &dirContents)
+{
+	int res = -1;
+	dirContents = "";
+
+	if (dirPath == "")//currrent dir
+	{
+		if (this->currentDirectory->nbrOfKids == 0)
+		{
+			dirContents = "Current directory is empty";
+		}
+		else
+		{
+			for (int i = 0; i < this->currentDirectory->nbrOfKids; i++)
+			{
+				dirContents += this->currentDirectory->kids[i]->directoryName + " ";
+			}
+		}
+		res = 1;
+	}
+	else
+	{
+<<<<<<< HEAD
 		result = CheckKidsMakeDir(this->currentDirectory, dirs, 0);
 		std::cout << "Check kids result: " <<  result << std::endl;
 	}
@@ -433,4 +557,37 @@ int FileSystem::DeleteFileBlock(int fileBlockToDelete)
 	int result = -5;
 	result = mMemblockDevice.DeleteBlock(fileBlockToDelete);
 	return result;
+=======
+		std::vector<std::string> dirs = ConvertDirPathToVector(dirPath);
+		node* currentNode;
+
+		if (dirPath[0] == '/')
+		{
+			currentNode = &root;
+			res = this->GetDirectory(currentNode, dirs, 1);//1 since first index is '/' for absolut path
+		}
+		else
+		{
+			currentNode = currentDirectory;
+			res = this->GetDirectory(currentNode, dirs, 0);
+		}
+
+		if (res == 1)
+		{
+			if (currentNode->nbrOfKids == 0)
+			{
+				dirContents = "Current directory is empty";
+			}
+			else
+			{
+				for (int i = 0; i < currentNode->nbrOfKids; i++)
+				{
+					dirContents += currentNode->kids[i]->directoryName + " ";
+				}
+			}
+		}
+	}
+
+	return res;
+>>>>>>> 4ad6813f4147094e0d9c7af4082e79c2d7260dc9
 }

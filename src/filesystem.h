@@ -17,7 +17,7 @@ private:
     // Here you can add your own data structures
     struct node
     {
-        std::string directoryName;
+        std::string directoryName;//Dirname or file name
         unsigned int nbrOfKids;
         node** kids;
         node* parent;
@@ -36,6 +36,8 @@ public:
      * However, you are free to change the parameterlist and specify your own returntype for each function below.
      */
 
+	int cat(std::string filePath, std::string &fileContent);
+
 	/* Saves the filesystem to an image on the disk */
 	int CreateImageCd(std::string fileName);
 
@@ -46,10 +48,10 @@ public:
 	int Format(std::string &currentDir);
 
     /* This function creates a file in the filesystem */
-    int CreateFile(std::string filePath, std::string currentDir);
+	int create(std::string filePath, std::string fileContent);
     
     /* Creates a folder in the filesystem */
-    int MakeDirectory(std::string dirPath, std::string currentDir);
+	int mkdir(std::string dirPath);
 
     /* Removes a file in the filesystem */
 	int rmFile(std::string fileToRemove);
@@ -58,27 +60,28 @@ public:
 	int rmDir(std::string dirToRemove);
 
     /* Function will move the current location to a specified location in the filesystem */
-	int GoToDirectory(std::string dirPath, std::string &currentWorkDir);//cd
+	int cd(std::string dirPath);
 
     /* This function will get all the files and folders in the specified folder */
-    int ListDir(std::string dirPath, std::string currentDir);
+	int ls(std::string dirPath, std::string &dirContent);
 
 	/* This function will return the absolut path to the working directory*/
 
 
     /* Add your own member-functions if needed */
 private:
-	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);							//Used by all
-	void CreateNewNode(std::string dirName, node* parent);											//mkdir
-    int CheckKidsMakeDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);		//mkdir
-	int CheckKidsListDir(node *currentNode, std::vector<std::string> dirs, unsigned int index);		//ls
-	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> dirs, unsigned int index);	//cd
+	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);							//Used by all													
+	void CreateNewNode(std::string dirName, node* parent, int blockNr);								//mkdir
 
+	int CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> &dirs, unsigned int index);//returns the blocknumber of a file
+	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> &dirs, unsigned int index);	//cd
+	int GetDirectory(node *&currentNode, std::vector<std::string> &dirs, unsigned int index);
 
 	int DeleteNode(node *nodeToBeDeleted);
 	int DeleteFileBlock(int fileBlockToDelete);
 	int RemoveFolder(node *currentNode, int kidNbr);
 	int RemoveFile(node *currentNode, int kidNbr, int fileBlock);
+
 };
 
 #endif // FILESYSTEM_H
