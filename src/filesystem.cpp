@@ -200,23 +200,23 @@ int FileSystem::CheckKidsFindBlockNr(node *currentNode, std::vector<std::string>
 	}
 	else
 	{
-		for (unsigned int k = 0; k < currentNode->nbrOfKids; k++)
+		for (unsigned int i = 0; i < currentNode->nbrOfKids; i++)
 		{
 			if (dirs.size() - 1 > index)
 			{
-				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)
 				{
 					index++;
-					blockNr = CheckKidsFindBlockNr(currentNode->kids[k], dirs, index);
-					k = currentNode->nbrOfKids;//exit loop
+					blockNr = CheckKidsFindBlockNr(currentNode->kids[i], dirs, index);
+					i = currentNode->nbrOfKids;//exit loop
 				}
 			}
 			else //in last folder
 			{
-				if (currentNode->kids[k]->directoryName.compare(dirs[index]) == 0)
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr > -1)
 				{
-					blockNr = currentNode->kids[k]->blockNr;
-					k = currentNode->nbrOfKids;//exit loop
+					blockNr = currentNode->kids[i]->blockNr;
+					i = currentNode->nbrOfKids;//exit loop
 				}
 				else
 				{
@@ -310,6 +310,8 @@ int FileSystem::ls(std::string dirPath, std::string &dirContents)
 {
 	int res = -1;
 	dirContents = "";
+
+	int stopper = 0;
 
 	if (dirPath == "")//currrent dir
 	{

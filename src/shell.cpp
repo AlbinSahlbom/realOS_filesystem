@@ -27,8 +27,8 @@ int main(void) {
 
     bool bRun = true;
 
-	std::string fileContents;//used for setting and getting fileContents(create, cat)
-	std::string dirContents;//used for ls
+	std::string fileContents = "";//used for setting and getting fileContents(create, cat)
+	std::string dirContents = "";//used for ls
 
     do {
         std::cout << user << ":" << currentDir << "$ "<< std::endl;
@@ -52,7 +52,7 @@ int main(void) {
                 std::cout << "LS called" << std::endl;
 				if (fileSystem->ls(commandArr[1], dirContents) == -1)
 				{
-					std::cout << "ERROR ls: directory " << commandArr[1] << "not found or there are no files/directories in the map" << std::endl;
+					std::cout << "ERROR ls: directory " << commandArr[1] << " not found or there are no files/directories in the map" << std::endl;
 				}
 				std::cout << dirContents << std::endl;
 				ClearCommandArr(commandArr);
@@ -77,6 +77,7 @@ int main(void) {
 				std::cout << "CAT called" << std::endl;
 				fileSystem->cat(commandArr[1], fileContents);
 				std::cout << fileContents << std::endl;
+				ClearCommandArr(commandArr);
                 break;
             case 5: // createImagecd
                 break;
