@@ -38,6 +38,8 @@ private:
 	int DeleteFileBlock(int fileBlockToDelete);
 	int RemoveFolder(node *currentNode, int kidNbr);
 	int RemoveFile(node *currentNode, int kidNbr, int fileBlock);
+	int SaveTree(std::ofstream &imageFile, node *currentNode);
+
 
 public:
 	FileSystem(int nbrOfBlocks);

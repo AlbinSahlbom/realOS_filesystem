@@ -365,12 +365,12 @@ int FileSystem::CreateImageCd(std::string fileName)
 {
 	int result = -1;
 
+	this->currentDirectory = &this->root;
+
 	std::ofstream imageFile;
 	imageFile.open(fileName);
-	//Annan funktion for att gora rekursivt, skriver ut noden och sen g�r man igenom alla barn.
-	for (int i = 0; i < currentNode)
-	imageFile <<
-
+	result = SaveTree(imageFile, currentDirectory);
+	imageFile.close();
 	return result;
 }
 
@@ -492,8 +492,21 @@ int FileSystem::DeleteFileBlock(int fileBlockToDelete)
 	return result;
 }
 
-int FileSystem::SaveTree(std::ofstream imageFile, node *currentNode)
-{}
+int FileSystem::SaveTree(std::ofstream &imageFile, node *currentNode)
+{
+	int result = 0;
+	imageFile << currentNode->directoryName << "\r\n";
+	imageFile << currentNode->blockNr << "\r\n";
+	//imageFile << currentNode->kids << "\r\n";			//Does not need to store this, we have parentPointer. Can generate kids.
+	imageFile << currentNode->nbrOfKids << "\r\n";
+	imageFile << currentNode->parent->directoryName << "\r\n";
+	
+	for (int i = 0; i < currentNode->nbrOfKids; i++)
+	{
+		result = SaveTree(imageFile, currentNode->kids[i]);
+	}
+	return result;
+}
 
 int FileSystem::cp(std::string fileName1, std::string fileName2)
 {
