@@ -112,7 +112,7 @@ int main(void) {
 				break;
             case 13: // cd					//Klar
 				std::cout << "CD CALLED" << std::endl;
-				if (fileSystem->cd(commandArr[1]) == -1)
+				if (fileSystem->cd(commandArr[1], currentDir) == -1)
 				{
 					std::cout << "cd: cannot create directory " << commandArr[1] << ": No such file or directory\n" << std::endl;
 				}

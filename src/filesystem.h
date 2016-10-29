@@ -54,7 +54,7 @@ public:
 	int mkdir(std::string dirPath);
 	int create(std::string filePath, std::string fileContent);
 	int cat(std::string filePath, std::string &fileContent);
-	int cd(std::string dirPath);
+	int cd(std::string dirPath, std::string &currentDir);
 	int ls(std::string dirPath, std::string &dirContent);
 	int cp(std::string fileName1, std::string fileName2);
 	

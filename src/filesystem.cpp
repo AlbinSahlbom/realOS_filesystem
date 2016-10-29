@@ -279,7 +279,7 @@ int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> 
 	return result;
 }
 
-int FileSystem::cd(std::string dirPath)
+int FileSystem::cd(std::string dirPath, std::string &currentDir)
 {
 	int res = -1;
 	std::vector<std::string> dirs;
@@ -301,6 +301,17 @@ int FileSystem::cd(std::string dirPath)
 	else
 	{
 		res = SetCurrentDirByPath(this->currentDirectory, dirs, 0);
+	}
+	if (res == 1 && dirPath[0] == '/')
+	{
+		currentDir = dirPath;
+	}
+	else if (res == 1 && dirPath[0] != '/')
+	{
+		if (currentDir.compare("/") == 0)
+			currentDir += dirPath;
+		else
+			currentDir += '/' + dirPath;
 	}
 	return res;
 }
@@ -369,7 +380,16 @@ int FileSystem::CreateImageCd(std::string fileName)
 
 	std::ofstream imageFile;
 	imageFile.open(fileName);
-	result = SaveTree(imageFile, currentDirectory);
+
+	/* The root, special case so we do that first */
+	imageFile << currentDirectory->directoryName << "\n";
+	imageFile << currentDirectory->blockNr << "\n";
+	imageFile << currentDirectory->nbrOfKids << "\n";
+	for (int i = 0; i < currentDirectory->nbrOfKids; i++)
+	{
+		result = SaveTree(imageFile, currentDirectory->kids[i]);
+	}
+	
 	imageFile.close();
 	return result;
 }
@@ -495,11 +515,16 @@ int FileSystem::DeleteFileBlock(int fileBlockToDelete)
 int FileSystem::SaveTree(std::ofstream &imageFile, node *currentNode)
 {
 	int result = 0;
-	imageFile << currentNode->directoryName << "\r\n";
-	imageFile << currentNode->blockNr << "\r\n";
-	//imageFile << currentNode->kids << "\r\n";			//Does not need to store this, we have parentPointer. Can generate kids.
-	imageFile << currentNode->nbrOfKids << "\r\n";
-	imageFile << currentNode->parent->directoryName << "\r\n";
+	imageFile << currentNode->directoryName << "\n";
+	imageFile << currentNode->blockNr << "\n";
+	if (currentNode->blockNr != -5)
+	{
+		std::string tempString;
+		tempString = this->mMemblockDevice.readBlock(currentNode->blockNr).toString();
+		imageFile << tempString << "\n";
+	}
+	imageFile << currentNode->nbrOfKids << "\n";
+	imageFile << currentNode->parent->directoryName << "\n";
 	
 	for (int i = 0; i < currentNode->nbrOfKids; i++)
 	{
