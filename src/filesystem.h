@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 class FileSystem
 {
@@ -37,6 +38,7 @@ private:
 	int DeleteFileBlock(int fileBlockToDelete);
 	int RemoveFolder(node *currentNode, int kidNbr);
 	int RemoveFile(node *currentNode, int kidNbr, int fileBlock);
+
 public:
 	FileSystem(int nbrOfBlocks);
     ~FileSystem();

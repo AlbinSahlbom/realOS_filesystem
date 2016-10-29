@@ -365,6 +365,11 @@ int FileSystem::CreateImageCd(std::string fileName)
 {
 	int result = -1;
 
+	std::ofstream imageFile;
+	imageFile.open(fileName);
+	//Annan funktion for att gora rekursivt, skriver ut noden och sen g�r man igenom alla barn.
+	for (int i = 0; i < currentNode)
+	imageFile <<
 
 	return result;
 }
@@ -486,3 +491,4 @@ int FileSystem::DeleteFileBlock(int fileBlockToDelete)
 	result = mMemblockDevice.DeleteBlock(fileBlockToDelete);
 	return result;
 }
+
