@@ -91,6 +91,12 @@ int main(void) {
 				fileSystem->rmDir(commandArr[1]);
 				break;
             case 9: // cp					//Fixa
+				std::cout << "CP called" << std::endl;
+				if (fileSystem->cp(commandArr[1], commandArr[2]) == -1)
+				{
+					std::cout << "ERROR cp: cannor copy file" << std::endl;
+				}
+				ClearCommandArr(commandArr);
                 break;
             case 10: // append				//Behover inte ha med
                 break;
