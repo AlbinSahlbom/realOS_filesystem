@@ -86,6 +86,12 @@ int main(void) {
             case 7: // rm
                 break;
             case 8: // cp
+				std::cout << "CP called" << std::endl;
+				if (fileSystem->cp(commandArr[1], commandArr[2]) == -1)
+				{
+					std::cout << "ERROR cp: cannor copy file" << std::endl;
+				}
+				ClearCommandArr(commandArr);
                 break;
             case 9: // append
                 break;

@@ -41,7 +41,7 @@ public:
 	int cat(std::string filePath, std::string &fileContent);
 	int cd(std::string dirPath);
 	int ls(std::string dirPath, std::string &dirContent);
-	
+	int cp(std::string fileName1, std::string fileName2);
 	
 };
 

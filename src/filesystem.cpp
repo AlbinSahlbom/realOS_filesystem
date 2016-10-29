@@ -64,9 +64,9 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent, int blockNr)
 		temp = nullptr;
 
 	}
-	for (int i = 0; i < parent->nbrOfKids; i++)
+	/*for (int i = 0; i < parent->nbrOfKids; i++)
 		std::cout << parent->kids[i]->directoryName << std::endl;
-	std::cout << parent->nbrOfKids << std::endl;
+	std::cout << parent->nbrOfKids << std::endl;*/
 	return;
 }
 
@@ -359,6 +359,39 @@ int FileSystem::ls(std::string dirPath, std::string &dirContents)
 			}
 		}
 	}
+
+	return res;
+}
+
+int FileSystem::cp(std::string fileName1, std::string fileName2)
+{
+	int res = -1;
+
+	if (fileName1.compare(fileName2) == 0)
+	{
+		res = -1;
+	}
+	else
+	{
+		for (int i = 0; i < this->currentDirectory->nbrOfKids; i++)
+		{
+			if (this->currentDirectory->kids[i]->directoryName.compare(fileName1) == 0)
+			{
+				//file exist in current folder
+				std::string fileContent;
+				this->cat(fileName1, fileContent);
+				this->create(fileName2, fileContent);
+				res = 1;
+				i = this->currentDirectory->nbrOfKids;//exit loop
+			}
+			else
+			{
+				//file doesnt exist in current folder
+				res = -1;
+			}
+		}
+	}
+
 
 	return res;
 }
