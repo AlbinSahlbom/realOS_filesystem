@@ -492,3 +492,4 @@ int FileSystem::DeleteFileBlock(int fileBlockToDelete)
 	return result;
 }
 
+int FileSystem::SaveTree(std::ofstream imageFile, node *currentNode)
