@@ -74,7 +74,6 @@ std::vector<std::string> FileSystem::ConvertDirPathToVector(std::string dirPath)
 {
 	std::vector<std::string> dirs;
 	std::string temp = "";
-	int asd = dirPath.length();
 	for (unsigned int i = 0; i <= dirPath.length(); i++)
 	{
 
@@ -232,7 +231,6 @@ int FileSystem::cat(std::string filePath, std::string &fileContent)
 	int blockNr = -1;
 
 	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
-	node* currentNode;
 
 	if (filePath[0] == '/')
 	{
@@ -318,8 +316,6 @@ int FileSystem::ls(std::string dirPath, std::string &dirContents)
 {
 	int res = -1;
 	dirContents = "";
-
-	int stopper = 0;
 
 	if (dirPath == "")//currrent dir
 	{
@@ -549,7 +545,6 @@ void FileSystem::LoadTree(std::ifstream &imageFile, node *parentNode, int index)
 	int tempBlockNbrInt = 0;
 	std::string tempFileContent;
 	std::string tempNbrOfKids;
-	int tempNbrOfKidsInt = 0;
 	
 
 	std::getline(imageFile, tempName);
