@@ -21,16 +21,16 @@ private:
         unsigned int nbrOfKids;
         node** kids;
         node* parent;
-        int blockNr;    //-5 if dir otherwhise 0-249 for blocks
+        int blockNbr;    //-5 if dir otherwhise 0-249 for blocks
     } root;
 	node * currentDirectory;
 	node allNodes[250];
 
-	void CreateNewNode(std::string dirName, node* parent, int blockNr);
+	void CreateNewNode(std::string dirName, node* parent, int blockNbr);
 	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);
 
 	int SetCurrentDirByPath(node *currentNode, std::vector<std::string> &dirs, unsigned int index);//cd
-	int CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> &dirs, unsigned int index);//returns the blocknumber of a file
+	int CheckKidsFindBlockNbr(node *currentNode, std::vector<std::string> &dirs, unsigned int index);//returns the blocknumber of a file
 
 	int GetDirectory(node *&currentNode, std::vector<std::string> &dirs, unsigned int index);
 

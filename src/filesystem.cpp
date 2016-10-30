@@ -3,7 +3,7 @@
 FileSystem::FileSystem(int nbrOfBlocks) {
 	this->root.parent = nullptr;
 	this->root.kids = nullptr;
-	this->root.blockNr = -5;
+	this->root.blockNbr = -5;
 	this->root.nbrOfKids = 0;
 	this->root.directoryName = "/";
 
@@ -36,14 +36,14 @@ int FileSystem::TakeFirstFreeBlockNbr()
 	return firstFreeBlock;
 }
 
-void FileSystem::CreateNewNode(std::string dirName, node* parent, int blockNr)
+void FileSystem::CreateNewNode(std::string dirName, node* parent, int blockNbr)
 {
 	node *newNode = new node;
 	newNode->directoryName = dirName;
 	newNode->parent = parent;
 	newNode->kids = nullptr;
 	newNode->nbrOfKids = 0;
-	newNode->blockNr = blockNr;
+	newNode->blockNbr = blockNbr;
 
 	if (parent->nbrOfKids == 0)
 	{
@@ -109,7 +109,7 @@ int FileSystem::GetDirectory(node *&currentNode, std::vector<std::string> &dirs,
 		{
 			if (dirs.size() - 1 > index)
 			{
-				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//if directory in path, and is actually an directory and not a file
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNbr == -5)//if directory in path, and is actually an directory and not a file
 				{
 					index++;
 					currentNode = currentNode->kids[i];
@@ -164,7 +164,7 @@ int FileSystem::mkdir(std::string dirPath)
 int FileSystem::create(std::string filePath, std::string fileContent)
 {
 	int res = -1;
-	int blockNr = this->TakeFirstFreeBlockNbr();
+	int blockNbr = this->TakeFirstFreeBlockNbr();
 	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
 	node* currentNode;
 
@@ -181,19 +181,19 @@ int FileSystem::create(std::string filePath, std::string fileContent)
 
 	if (res == 1)
 	{
-		CreateNewNode(dirs[dirs.size() - 1], currentNode, blockNr);
-		this->mMemblockDevice.writeBlock(blockNr, fileContent);
+		CreateNewNode(dirs[dirs.size() - 1], currentNode, blockNbr);
+		this->mMemblockDevice.writeBlock(blockNbr, fileContent);
 	}
 	return res;
 }
 
-int FileSystem::CheckKidsFindBlockNr(node *currentNode, std::vector<std::string> &dirs, unsigned int index)
+int FileSystem::CheckKidsFindBlockNbr(node *currentNode, std::vector<std::string> &dirs, unsigned int index)
 {
-	int blockNr = -1;
+	int blockNbr = -1;
 
 	if (dirs.size() - 1 == index && currentNode->nbrOfKids == 0)
 	{
-		blockNr = -1;
+		blockNbr = -1;
 	}
 	else
 	{
@@ -201,49 +201,49 @@ int FileSystem::CheckKidsFindBlockNr(node *currentNode, std::vector<std::string>
 		{
 			if (dirs.size() - 1 > index)
 			{
-				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNbr == -5)
 				{
 					index++;
-					blockNr = CheckKidsFindBlockNr(currentNode->kids[i], dirs, index);
+					blockNbr = CheckKidsFindBlockNbr(currentNode->kids[i], dirs, index);
 					i = currentNode->nbrOfKids;//exit loop
 				}
 			}
 			else //in last folder
 			{
-				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr > -1)
+				if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNbr > -1)
 				{
-					blockNr = currentNode->kids[i]->blockNr;
+					blockNbr = currentNode->kids[i]->blockNbr;
 					i = currentNode->nbrOfKids;//exit loop
 				}
 				else
 				{
-					blockNr = -1;
+					blockNbr = -1;
 				}
 			}
 		}
 	}
 
-	return blockNr;
+	return blockNbr;
 }
 
 int FileSystem::cat(std::string filePath, std::string &fileContent)
 {
-	int blockNr = -1;
+	int blockNbr = -1;
 
 	std::vector<std::string> dirs = ConvertDirPathToVector(filePath);
 
 	if (filePath[0] == '/')
 	{
-		blockNr = this->CheckKidsFindBlockNr(&this->root, dirs, 1);
+		blockNbr = this->CheckKidsFindBlockNbr(&this->root, dirs, 1);
 	}
 	else
 	{
-		blockNr = this->CheckKidsFindBlockNr(this->currentDirectory, dirs, 0);
+		blockNbr = this->CheckKidsFindBlockNbr(this->currentDirectory, dirs, 0);
 	}
 
-	if (blockNr != -1)
+	if (blockNbr != -1)
 	{
-		fileContent = this->mMemblockDevice.readBlock(blockNr).toString();
+		fileContent = this->mMemblockDevice.readBlock(blockNbr).toString();
 
 		return 1;
 	}
@@ -260,14 +260,14 @@ int FileSystem::SetCurrentDirByPath(node *currentNode, std::vector<std::string> 
 	int result = -1;
 	for (int i = 0; i < currentNode->nbrOfKids; i++)
 	{
-		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//last folder in searchpath
+		if (dirs.size() - 1 == index && currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNbr == -5)//last folder in searchpath
 		{
 			//dir exists, set current directory to point at the dir found
 			this->currentDirectory = currentNode->kids[i];
 			i = currentNode->nbrOfKids;//exit loop
 			result = 1;
 		}
-		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNr == -5)//search for kids, if found use function recursively
+		else if (currentNode->kids[i]->directoryName.compare(dirs[index]) == 0 && currentNode->kids[i]->blockNbr == -5)//search for kids, if found use function recursively
 		{
 			result = SetCurrentDirByPath(currentNode->kids[i], dirs, ++index);
 		}
@@ -291,7 +291,13 @@ int FileSystem::cd(std::string dirPath, std::string &currentDir)
 		}
 		else//else reccusion
 		{
-			res = SetCurrentDirByPath(&root, dirs, 1);
+			node *temp = currentDirectory;
+			currentDirectory = &root;
+			res = SetCurrentDirByPath(currentDirectory, dirs, 1);
+			if (res == -1)
+			{
+				currentDirectory = temp;
+			}
 		}
 	}
 	else
@@ -416,7 +422,7 @@ int FileSystem::Format(std::string &currentDir)
 	int result = -5;
 	for (int i = 0; i < 250; i++)
 	{
-		this->allNodes[i].blockNr = i;
+		this->allNodes[i].blockNbr = i;
 		this->allNodes[i].directoryName = "";
 		this->allNodes[i].kids = nullptr;
 		this->allNodes[i].nbrOfKids = 0;
@@ -435,9 +441,9 @@ int FileSystem::DeleteNode(node *nodeToBeDeleted)
 	int result = -5;
 	for (int i = 0; i < nodeToBeDeleted->nbrOfKids; i++)
 	{
-		if (nodeToBeDeleted->kids[i]->blockNr != -5)
+		if (nodeToBeDeleted->kids[i]->blockNbr != -5)
 		{
-			result = RemoveFile(nodeToBeDeleted, i, nodeToBeDeleted->kids[i]->blockNr);
+			result = RemoveFile(nodeToBeDeleted, i, nodeToBeDeleted->kids[i]->blockNbr);
 			i--;
 		}
 		else if (nodeToBeDeleted->kids[i]->nbrOfKids == 0)
@@ -461,7 +467,7 @@ int FileSystem::rmFile(std::string fileToRemove)
 	{
 		if (currentDirectory->kids[i]->directoryName == fileToRemove)
 		{
-			result = RemoveFile(currentDirectory, i, currentDirectory->kids[i]->blockNr);
+			result = RemoveFile(currentDirectory, i, currentDirectory->kids[i]->blockNbr);
 			i = currentDirectory->nbrOfKids;
 		}
 	}
@@ -474,7 +480,7 @@ int FileSystem::rmDir(std::string dirToRemove)
 	int result = -5;
 	for (int i = 0; i < currentDirectory->nbrOfKids; i++)
 	{
-		if (currentDirectory->kids[i]->directoryName == dirToRemove && currentDirectory->kids[i]->blockNr == -5)
+		if (currentDirectory->kids[i]->directoryName == dirToRemove && currentDirectory->kids[i]->blockNbr == -5)
 		{
 			result = RemoveFolder(currentDirectory, i);
 			i = currentDirectory->nbrOfKids;
@@ -486,7 +492,7 @@ int FileSystem::rmDir(std::string dirToRemove)
 int FileSystem::RemoveFile(node *currentNode, int kidNbr, int fileBlock)
 {
 	int result = -5;
-	result = DeleteFileBlock(currentNode->blockNr);
+	result = DeleteFileBlock(currentNode->blockNbr);
 	this->allBlockNbrs[fileBlock] = fileBlock;
 	delete currentNode->kids[kidNbr];
 	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
@@ -522,11 +528,11 @@ int FileSystem::SaveTree(std::ofstream &imageFile, node *currentNode)
 {
 	int result = 0;
 	imageFile << currentNode->directoryName << "\n";
-	imageFile << currentNode->blockNr << "\n";
-	if (currentNode->blockNr != -5)
+	imageFile << currentNode->blockNbr << "\n";
+	if (currentNode->blockNbr != -5)
 	{
 		std::string tempString;
-		tempString = this->mMemblockDevice.readBlock(currentNode->blockNr).toString();
+		tempString = this->mMemblockDevice.readBlock(currentNode->blockNbr).toString();
 		imageFile << tempString << "\n";
 	}
 	imageFile << currentNode->nbrOfKids << "\n";

@@ -44,10 +44,10 @@ int main(void) {
                 bRun = false;
                 std::cout << "Exiting\n" << std::endl;
                 break;
-            case 1: // format				//Klar
+            case 1: // format
 				fileSystem->Format(currentDir);
                 break;
-            case 2: // ls					//Klar
+            case 2: // ls
 				std::cout << "LS called" << std::endl;
 				if (fileSystem->ls(commandArr[1], dirContents) == -1)
 				{
@@ -56,7 +56,7 @@ int main(void) {
 				std::cout << dirContents << std::endl;
 				ClearCommandArr(commandArr);
 				break;
-            case 3: // create				//Klar
+            case 3: // create
 				std::cout << "ENTER FILE CONTENTS(max 512 chars):" << std::endl;
 				/*512 a-> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
 
@@ -72,13 +72,13 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
 				break;
-            case 4: // cat					//Klar
+            case 4: // cat
 				std::cout << "CAT called" << std::endl;
 				fileSystem->cat(commandArr[1], fileContents);
 				std::cout << fileContents << std::endl;
 				ClearCommandArr(commandArr);
 				break;
-            case 5: // createImagecd		//Fixa
+            case 5: // createImagecd
 				if (!(commandArr[1] == "" && commandArr[1] == " "))
 				{
 					fileSystem->CreateImageCd(commandArr[1]);
@@ -89,16 +89,16 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
                 break;
-            case 6: // restoreImagecd		//Fixa
+            case 6: // restoreImagecd
 				fileSystem->RestoreImageCd(commandArr[1], currentDir);
                 break;
-            case 7: // rmFile				//Klar
+            case 7: // rmFile
 				fileSystem->rmFile(commandArr[1]);
                 break;
-			case 8:	// rmDir				//Klar
+			case 8:	// rmDir
 				fileSystem->rmDir(commandArr[1]);
 				break;
-            case 9: // cp					//Fixa
+            case 9: // cp
 				std::cout << "CP called" << std::endl;
 				if (fileSystem->cp(commandArr[1], commandArr[2]) == -1)
 				{
@@ -110,7 +110,7 @@ int main(void) {
                 break;
             case 11: // mv					//Behover inte ha med
                 break;
-            case 12: // mkdir				//Klar
+            case 12: // mkdir
 				std::cout << "MKDIR called" << std::endl;
 				if (fileSystem->mkdir(commandArr[1]) == -1)
 				{
@@ -118,7 +118,7 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
 				break;
-            case 13: // cd					//Klar
+            case 13: // cd
 				std::cout << "CD CALLED" << std::endl;
 				if (fileSystem->cd(commandArr[1], currentDir) == -1)
 				{
@@ -126,7 +126,7 @@ int main(void) {
 				}
 				ClearCommandArr(commandArr);
 				break;
-            case 14: // pwd					//Klar
+            case 14: // pwd
 				std::cout << currentDir << std::endl;
 				ClearCommandArr(commandArr);
                 break;
@@ -163,6 +163,7 @@ int ParseCommandString(const std::string &userCommand, std::string strArr[]) {
     }
     return counter;
 }
+
 int FindCommand(std::string &command) {
     int index = -1;
     for (int i = 0; i < NUMAVAILABLECOMMANDS && index == -1; ++i) {
@@ -185,7 +186,8 @@ std::string help() {
     helpStr += "* cat    <path>:                    Dumps contents of <file>.\n";
     helpStr += "* createImage  <real-file>:         Saves disk to <real-file>\n";
     helpStr += "* restoreImage <real-file>:         Reads <real-file> onto disk\n";
-    helpStr += "* rm     <file>:                    Removes <file>\n";
+    helpStr += "* rmFile     <file>:                Removes file <file>\n";
+	helpStr += "* rmDir	 <folder>:					Removes directory <folder\n>";
     helpStr += "* cp     <source> <destination>:    Copy <source> to <destination>\n";
     helpStr += "* append <source> <destination>:    Appends contents of <source> to <destination>\n";
     helpStr += "* mv     <old-file> <new-file>:     Renames <old-file> to <new-file>\n";
