@@ -552,7 +552,6 @@ void FileSystem::LoadTree(std::ifstream &imageFile, node *parentNode, int index)
 	std::string tempFileContent;
 	std::string tempNbrOfKids;
 	
-
 	std::getline(imageFile, tempName);
 	std::getline(imageFile, tempBlockNbr);
 	tempBlockNbrInt = std::stoi(tempBlockNbr);
