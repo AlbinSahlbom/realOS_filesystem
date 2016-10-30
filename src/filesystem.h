@@ -39,14 +39,14 @@ private:
 	int RemoveFolder(node *currentNode, int kidNbr);
 	int RemoveFile(node *currentNode, int kidNbr, int fileBlock);
 	int SaveTree(std::ofstream &imageFile, node *currentNode);
-
+	void LoadTree(std::ifstream &imageFile, node *parentNode, int index);
 
 public:
 	FileSystem(int nbrOfBlocks);
     ~FileSystem();
 	
 	int CreateImageCd(std::string fileName);
-	int RestoreImageCd(std::string fileName);
+	int RestoreImageCd(std::string fileName, std::string &currentDir);
 	int Format(std::string &currentDir);
 	int rmFile(std::string fileToRemove);
 	int rmDir(std::string dirToRemove);

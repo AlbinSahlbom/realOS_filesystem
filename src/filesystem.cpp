@@ -185,8 +185,6 @@ int FileSystem::create(std::string filePath, std::string fileContent)
 		CreateNewNode(dirs[dirs.size() - 1], currentNode, blockNr);
 		this->mMemblockDevice.writeBlock(blockNr, fileContent);
 	}
-
-
 	return res;
 }
 
@@ -376,29 +374,42 @@ int FileSystem::CreateImageCd(std::string fileName)
 {
 	int result = -1;
 
-	this->currentDirectory = &this->root;
-
 	std::ofstream imageFile;
 	imageFile.open(fileName);
 
-	/* The root, special case so we do that first */
-	imageFile << currentDirectory->directoryName << "\n";
-	imageFile << currentDirectory->blockNr << "\n";
-	imageFile << currentDirectory->nbrOfKids << "\n";
-	for (int i = 0; i < currentDirectory->nbrOfKids; i++)
+	if (imageFile.is_open())
 	{
-		result = SaveTree(imageFile, currentDirectory->kids[i]);
+		result = 0;
+		/* The root, special case so we do that first. The root is always the same, the onely thing that changes is nbrOfKids. */
+		imageFile << root.nbrOfKids << "\n";
+		for (int i = 0; i < root.nbrOfKids; i++)
+		{
+			result = SaveTree(imageFile, root.kids[i]);
+		}
+
+		imageFile.close();
 	}
-	
-	imageFile.close();
 	return result;
 }
 
-int FileSystem::RestoreImageCd(std::string fileName)
+int FileSystem::RestoreImageCd(std::string fileName, std::string &currentDir)
 {
 	int result = -1;
 
-
+	std::ifstream imageFile(fileName);
+	if (imageFile.is_open())
+	{
+		Format(currentDir);
+		result = 0;
+		std::string tempLine;
+		int howManyLoops = 0;
+		std::getline(imageFile, tempLine);
+		howManyLoops = std::stoi(tempLine);
+		for (int i = 0; i < howManyLoops; i++)
+		{
+			LoadTree(imageFile, &root, i);
+		}
+	}
 	return result;
 }
 
@@ -480,6 +491,7 @@ int FileSystem::RemoveFile(node *currentNode, int kidNbr, int fileBlock)
 {
 	int result = -5;
 	result = DeleteFileBlock(currentNode->blockNr);
+	this->allBlockNbrs[fileBlock] = fileBlock;
 	delete currentNode->kids[kidNbr];
 	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
 	{
@@ -496,8 +508,6 @@ int FileSystem::RemoveFolder(node *currentNode, int kidNbr)
 	delete currentNode->kids[kidNbr];
 	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
 	{
-		node *temp = currentNode->kids[i];
-		node *temp2 = currentNode->kids[i + 1];
 		currentNode->kids[i] = currentNode->kids[i + 1];
 	}
 	currentNode->kids[currentNode->nbrOfKids - 1] = nullptr;
@@ -524,13 +534,46 @@ int FileSystem::SaveTree(std::ofstream &imageFile, node *currentNode)
 		imageFile << tempString << "\n";
 	}
 	imageFile << currentNode->nbrOfKids << "\n";
-	imageFile << currentNode->parent->directoryName << "\n";
 	
 	for (int i = 0; i < currentNode->nbrOfKids; i++)
 	{
 		result = SaveTree(imageFile, currentNode->kids[i]);
 	}
 	return result;
+}
+
+void FileSystem::LoadTree(std::ifstream &imageFile, node *parentNode, int index)
+{
+	std::string tempName;
+	std::string tempBlockNbr;
+	int tempBlockNbrInt = 0;
+	std::string tempFileContent;
+	std::string tempNbrOfKids;
+	int tempNbrOfKidsInt = 0;
+	
+
+	std::getline(imageFile, tempName);
+	std::getline(imageFile, tempBlockNbr);
+	tempBlockNbrInt = std::stoi(tempBlockNbr);
+	if (tempBlockNbrInt != -5)
+	{
+		std::getline(imageFile, tempFileContent);
+		tempBlockNbrInt = TakeFirstFreeBlockNbr();
+		CreateNewNode(tempName, parentNode, tempBlockNbrInt);
+		this->mMemblockDevice.writeBlock(tempBlockNbrInt, tempFileContent);
+	}
+	else
+	{
+		int howManyLoops = 0;
+		std::getline(imageFile, tempNbrOfKids);
+		howManyLoops = std::stoi(tempNbrOfKids);
+		CreateNewNode(tempName, parentNode, tempBlockNbrInt);
+		for (int i = 0; i < howManyLoops; i++)
+		{
+			LoadTree(imageFile, parentNode->kids[index], i);
+		}
+	}
+	return;
 }
 
 int FileSystem::cp(std::string fileName1, std::string fileName2)

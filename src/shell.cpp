@@ -79,10 +79,18 @@ int main(void) {
 				ClearCommandArr(commandArr);
 				break;
             case 5: // createImagecd		//Fixa
-				fileSystem->CreateImageCd(commandArr[1]);
+				if (!(commandArr[1] == "" && commandArr[1] == " "))
+				{
+					fileSystem->CreateImageCd(commandArr[1]);
+				}
+				else
+				{
+					std::cout << "ERROR createImage: Must give a name to the file." << std::endl;
+				}
+				ClearCommandArr(commandArr);
                 break;
             case 6: // restoreImagecd		//Fixa
-				fileSystem->RestoreImageCd(commandArr[1]);
+				fileSystem->RestoreImageCd(commandArr[1], currentDir);
                 break;
             case 7: // rmFile				//Klar
 				fileSystem->rmFile(commandArr[1]);
