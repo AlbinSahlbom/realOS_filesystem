@@ -492,7 +492,6 @@ int FileSystem::rmDir(std::string dirToRemove)
 int FileSystem::RemoveFile(node *currentNode, int kidNbr, int fileBlock)
 {
 	int result = -5;
-	result = DeleteFileBlock(currentNode->blockNbr);
 	this->allBlockNbrs[fileBlock] = fileBlock;
 	delete currentNode->kids[kidNbr];
 	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
@@ -514,13 +513,6 @@ int FileSystem::RemoveFolder(node *currentNode, int kidNbr)
 	}
 	currentNode->kids[currentNode->nbrOfKids - 1] = nullptr;
 	currentNode->nbrOfKids--;
-	return result;
-}
-
-int FileSystem::DeleteFileBlock(int fileBlockToDelete)
-{
-	int result = -5;
-	result = mMemblockDevice.DeleteBlock(fileBlockToDelete);
 	return result;
 }
 
