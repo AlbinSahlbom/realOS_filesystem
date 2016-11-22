@@ -35,7 +35,6 @@ private:
 	int GetDirectory(node *&currentNode, std::vector<std::string> &dirs, unsigned int index);
 
 	int DeleteNode(node *nodeToBeDeleted);
-	int DeleteFileBlock(int fileBlockToDelete);
 	int RemoveFolder(node *currentNode, int kidNbr);
 	int RemoveFile(node *currentNode, int kidNbr, int fileBlock);
 	int SaveTree(std::ofstream &imageFile, node *currentNode);
