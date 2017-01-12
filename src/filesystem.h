@@ -10,21 +10,20 @@
 class FileSystem
 {
 private:
-    MemBlockDevice mMemblockDevice;
+	MemBlockDevice mMemblockDevice;
 	int* allBlockNbrs;
 	int nbrOfBlocks;
 	int TakeFirstFreeBlockNbr();
-    // Here you can add your own data structures
-    struct node
-    {
+	// Here you can add your own data structures
+	struct node
+	{
 		std::string directoryName;//Dirname or file name
-        unsigned int nbrOfKids;
-        node** kids;
-        node* parent;
-        int blockNbr;    //-5 if dir otherwhise 0-249 for blocks
-    } root;
+		unsigned int nbrOfKids;
+		node** kids;
+		node* parent;
+		int blockNbr;    //-5 if dir otherwhise 0-249 for blocks
+	} root;
 	node * currentDirectory;
-	node allNodes[250];
 
 	void CreateNewNode(std::string dirName, node* parent, int blockNbr);
 	std::vector<std::string> ConvertDirPathToVector(std::string dirPath);
@@ -42,8 +41,8 @@ private:
 
 public:
 	FileSystem(int nbrOfBlocks);
-    ~FileSystem();
-	
+	~FileSystem();
+
 	int CreateImageCd(std::string fileName);
 	int RestoreImageCd(std::string fileName, std::string &currentDir);
 	int Format(std::string &currentDir);
@@ -56,7 +55,7 @@ public:
 	int cd(std::string dirPath, std::string &currentDir);
 	int ls(std::string dirPath, std::string &dirContent);
 	int cp(std::string fileName1, std::string fileName2);
-	
+
 
 };
 

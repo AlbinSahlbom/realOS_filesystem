@@ -18,6 +18,10 @@ FileSystem::FileSystem(int nbrOfBlocks) {
 }
 
 FileSystem::~FileSystem() {
+
+	if (this->root.nbrOfKids > 0)
+		this->Format(this->root.directoryName);
+
 	delete[] this->allBlockNbrs;
 }
 
@@ -64,9 +68,7 @@ void FileSystem::CreateNewNode(std::string dirName, node* parent, int blockNbr)
 		temp = nullptr;
 
 	}
-	/*for (int i = 0; i < parent->nbrOfKids; i++)
-		std::cout << parent->kids[i]->directoryName << std::endl;
-	std::cout << parent->nbrOfKids << std::endl;*/
+
 	return;
 }
 
@@ -184,6 +186,7 @@ int FileSystem::create(std::string filePath, std::string fileContent)
 		CreateNewNode(dirs[dirs.size() - 1], currentNode, blockNbr);
 		this->mMemblockDevice.writeBlock(blockNbr, fileContent);
 	}
+
 	return res;
 }
 
@@ -420,14 +423,6 @@ int FileSystem::Format(std::string &currentDir)
 	currentDirectory = &this->root;
 	currentDir = this->root.directoryName;
 	int result = -5;
-	for (int i = 0; i < 250; i++)
-	{
-		this->allNodes[i].blockNbr = i;
-		this->allNodes[i].directoryName = "";
-		this->allNodes[i].kids = nullptr;
-		this->allNodes[i].nbrOfKids = 0;
-		this->allNodes[i].parent = nullptr;
-	}
 
 	/*Delete the whole filesystem*/
 	result = DeleteNode(&root);
@@ -439,11 +434,13 @@ int FileSystem::DeleteNode(node *nodeToBeDeleted)
 {
 
 	int result = -5;
+
 	for (int i = 0; i < nodeToBeDeleted->nbrOfKids; i++)
 	{
 		if (nodeToBeDeleted->kids[i]->blockNbr != -5)
 		{
 			result = RemoveFile(nodeToBeDeleted, i, nodeToBeDeleted->kids[i]->blockNbr);
+
 			i--;
 		}
 		else if (nodeToBeDeleted->kids[i]->nbrOfKids == 0)
@@ -457,6 +454,11 @@ int FileSystem::DeleteNode(node *nodeToBeDeleted)
 			i--;
 		}
 	}
+	if (nodeToBeDeleted->nbrOfKids == 0)
+	{
+		delete[] nodeToBeDeleted->kids;
+	}
+
 	return result;
 }
 
@@ -493,8 +495,10 @@ int FileSystem::RemoveFile(node *currentNode, int kidNbr, int fileBlock)
 {
 	int result = -5;
 	this->allBlockNbrs[fileBlock] = fileBlock;
+
 	delete currentNode->kids[kidNbr];
-	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
+
+	for (int i = kidNbr; i < currentNode->nbrOfKids - 1; i++)
 	{
 		currentNode->kids[i] = currentNode->kids[i + 1];
 	}
@@ -507,7 +511,7 @@ int FileSystem::RemoveFolder(node *currentNode, int kidNbr)
 {
 	int result = 1;
 	delete currentNode->kids[kidNbr];
-	for (int i = kidNbr; i < currentNode->nbrOfKids-1; i++)
+	for (int i = kidNbr; i < currentNode->nbrOfKids - 1; i++)
 	{
 		currentNode->kids[i] = currentNode->kids[i + 1];
 	}
@@ -527,8 +531,9 @@ int FileSystem::SaveTree(std::ofstream &imageFile, node *currentNode)
 		tempString = this->mMemblockDevice.readBlock(currentNode->blockNbr).toString();
 		imageFile << tempString << "\n";
 	}
-	imageFile << currentNode->nbrOfKids << "\n";
-	
+	else
+		imageFile << currentNode->nbrOfKids << "\n";
+
 	for (int i = 0; i < currentNode->nbrOfKids; i++)
 	{
 		result = SaveTree(imageFile, currentNode->kids[i]);
@@ -543,7 +548,7 @@ void FileSystem::LoadTree(std::ifstream &imageFile, node *parentNode, int index)
 	int tempBlockNbrInt = 0;
 	std::string tempFileContent;
 	std::string tempNbrOfKids;
-	
+
 	std::getline(imageFile, tempName);
 	std::getline(imageFile, tempBlockNbr);
 	tempBlockNbrInt = std::stoi(tempBlockNbr);
